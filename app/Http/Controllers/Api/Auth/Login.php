@@ -39,8 +39,6 @@ class Login extends Controller
         // if ($user->password == bcrypt($req->password)) {
         //     return new Respons(false, 'Password kami masukkan salah', ['fail'=>true]);
         // }
-        $user->tokens()->delete();
-
         $success['token'] =  $user->createToken($user->name)->plainTextToken;
         return new Respons(true, 'Success Login', $success);
     }

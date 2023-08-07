@@ -16,3 +16,11 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/apiNotAuth', function(){
+    return response()->json([
+        'message' => 'Not authenticated'
+    ], 401);
+})->name('apiNotAuth');
+
+

@@ -14,7 +14,7 @@ class Respons extends JsonResource
      */
     public $success,$resource,$message;
 
-    public function __construct($success,$message,$resource){
+    public function __construct($success,$message,$resource=null){
         parent::__construct($resource);
         $this->message = $message;
         $this->success = $success;
