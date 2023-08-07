@@ -13,9 +13,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('user_markets', function (Blueprint $table) {
-            $table->bigInteger('user_id_main')->primary();
-            $table->string('user_id_market',12)->unique();
+        Schema::create('categories', function (Blueprint $table) {
+            $table->id();
+            $table->string('name',30);
         });
     }
 
@@ -24,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('user_markets');
+        Schema::dropIfExists('categories');
     }
 };

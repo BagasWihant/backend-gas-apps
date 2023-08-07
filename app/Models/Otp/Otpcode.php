@@ -1,16 +1,14 @@
 <?php
 
-namespace App\Models\Marketplace;
+namespace App\Models\Otp;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
 
-class UserMarket extends Model
+class Otpcode extends Model
 {
     use HasFactory;
     protected $connection = 'mysql_market';
-    protected $fillable = ['user_id_main','user_id_market'];
+    protected $fillable = ['key','otp','valid','tipe','status'];
     public $timestamps = false;
-
 }
