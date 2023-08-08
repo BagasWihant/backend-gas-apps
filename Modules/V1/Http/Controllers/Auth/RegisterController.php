@@ -1,22 +1,21 @@
 <?php
 
-namespace App\Http\Controllers\Api\Auth;
+namespace Modules\V1\Http\Controllers\Auth;
 
 use stdClass;
-use Carbon\Carbon;
 use App\Models\User;
+use App\Models\Otp\Otpcode;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use App\Http\Resources\Respons;
+use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
-use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Mail;
 use App\Models\Marketplace\UserMarket;
 use Laravel\Socialite\Facades\Socialite;
-use App\Mail\OTP\Register as OTPRegister;
-use App\Models\Otp\Otpcode;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Contracts\Support\Renderable;
 
-class Register extends Controller
+class RegisterController extends Controller
 {
     protected $strleft;
 
