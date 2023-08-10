@@ -24,13 +24,6 @@ class AddressController extends Controller
         return new Respons(true,'Daftar Alamat',$data);
     }
 
-
-    public function create()
-    {
-        return view('v1::create');
-    }
-
-
     public function store(Request $req)
     {
         $valid = $req->only('label','alamat','detail_alamat','pemilik','phone');

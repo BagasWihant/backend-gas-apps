@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('detail_alamat')->nullable();
             $table->string('pemilik',40);
             $table->string('phone',15);
-            $table->char('status',1);
+            $table->char('status',1)->default('0');
         });
     }
 

@@ -19,7 +19,13 @@ class AddressRepo {
     public function createAddress($data){
         $userMarket = UserMarket::select('user_id_market')->where('user_id_main',$data['user_id'])->first();
 
-        dd($data);
-        // $address = Address::create([]);
+        $address = Address::create([
+            'user_id_market' => $userMarket->user_id_market,
+            'label' => $data['label'],
+            'alamat' => $data['alamat'],
+            'detail_alamat' => $data['detail_alamat'],
+            'pemilik' => $data['pemilik'],
+            'phone' => $data['phone'],
+        ]);
     }
 }
