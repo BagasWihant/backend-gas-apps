@@ -26,13 +26,12 @@ class RegisterController extends Controller
 
     public function registerSendOtp(Request $req)
     {
-        $validator = Validator::make($req->all(), [
+        $validator = Validator::make($req->only('email'), [
             'email' => 'required|email:filter,spoof,dns|unique:users,email',
         ]);
 
-        if ($validator->fails()) {
-            return new Respons(false, 'Validation Failed', $validator->errors());
-        }
+        if ($validator->fails()) return new Respons(false, 'Validation Failed', $validator->errors());
+
 
         // GET OTP
         $validUntil = Carbon::now()->addMinute(5);
@@ -52,7 +51,7 @@ class RegisterController extends Controller
 
     public function registerConfirmOtp(Request $req)
     {
-        $validator = Validator::make($req->all(), [
+        $validator = Validator::make($req->only('key','otp'), [
             'key' => 'required|unique:users,email',
             'otp' => 'required',
         ]);
@@ -73,7 +72,8 @@ class RegisterController extends Controller
     public function register(Request $req)
     {
         // Validasi
-        $validator = Validator::make($req->all(), [
+        $only = $req->only('name','email','password','phone');
+        $validator = Validator::make($only, [
             'name' => 'required',
             'email' => 'required|email:filter,spoof,dns|unique:users,email',
             'password' => 'required',
@@ -86,7 +86,7 @@ class RegisterController extends Controller
         if(!$otp) return new Respons(false, 'Email belum diverifikasi');
 
 
-        $input  = $req->all();
+        $input  = $only;
         $input['password'] = bcrypt($input['password']);
         try {
             // input ke db

@@ -19,7 +19,7 @@ class LoginController extends Controller
 {
     public function login(Request $req)
     {
-        $validator = Validator::make($req->all(), [
+        $validator = Validator::make($req->only('email','password'), [
             'email'  => 'required|email',
             'password' => 'required|min:6'
         ]);
@@ -38,7 +38,7 @@ class LoginController extends Controller
     }
 
     public function resetPasswordSendOtp(Request $req){
-        $validator = Validator::make($req->all(), [
+        $validator = Validator::make($req->only('email'), [
             'email' => 'required|email:filter,spoof,dns',
         ]);
 
@@ -75,7 +75,7 @@ class LoginController extends Controller
 
     public function resetPassword(Request $req){
          // Validasi
-         $validator = Validator::make($req->all(), [
+        $validator = Validator::make($req->only('email','password','c_password'), [
             'password' => 'required',
             'c_password' => 'required|same:password',
             'email' => 'required',
