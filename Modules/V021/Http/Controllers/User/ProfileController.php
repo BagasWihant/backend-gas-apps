@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\V1\Http\Controllers\User;
+namespace Modules\V021\Http\Controllers\User;
 
 use App\Models\User;
 use Illuminate\Support\Str;
@@ -8,8 +8,8 @@ use Illuminate\Http\Request;
 use App\Http\Resources\Respons;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Marketplace\UserMarket;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Contracts\Support\Renderable;
 
 class ProfileController extends Controller
 {

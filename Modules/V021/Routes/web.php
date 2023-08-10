@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -13,6 +11,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::prefix('v1')->group(function() {
-    Route::get('/', 'V1Controller@index');
+Route::prefix('v021')->group(function() {
+    Route::get('/', 'V021Controller@index');
 });

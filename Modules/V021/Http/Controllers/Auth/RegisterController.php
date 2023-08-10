@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\V1\Http\Controllers\Auth;
+namespace Modules\V021\Http\Controllers\Auth;
 
 use stdClass;
 use App\Models\User;
@@ -46,7 +46,7 @@ class RegisterController extends Controller
             'title' => 'REGISTER CODE'
         ];
         // Mail::to($req->email)->send(new OTPRegister($mailData));
-        return new Respons(true, 'Code Sent Succesfully', $mailData);
+        return new Respons(true, 'Kode berhasil dikirim', $mailData);
     }
 
     public function registerConfirmOtp(Request $req)
@@ -82,8 +82,8 @@ class RegisterController extends Controller
         if ($validator->fails()) return new Respons(false, 'Validation Failed', $validator->errors());
 
 
-        $otp = Otpcode::where(['key' => $req->email, 'status'=>1])->first();
-        if(!$otp) return new Respons(false, 'Email belum diverifikasi');
+        // $otp = Otpcode::where(['key' => $req->email, 'status'=>1])->first();
+        // if(!$otp) return new Respons(false, 'Email belum diverifikasi');
 
 
         $input  = $only;
@@ -97,8 +97,13 @@ class RegisterController extends Controller
                 'user_id_main' => $userMain->id,
                 'user_id_market' => $userMarketId,
             ]);
-            $otp->delete();
+            // $otp->delete();
             DB::commit();
+            $res = collect([
+                'number' => $userMain->id,
+                'market' =>$userMarketId,
+            ]);
+            return new Respons(true, 'Berhasil mendaftar', $res);
         } catch (\Throwable $th) {
             DB::rollBack();
             return new Respons(false, $th->errorInfo[2], $th);

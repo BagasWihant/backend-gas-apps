@@ -1,21 +1,21 @@
 <?php
 
-namespace Modules\V1\Providers;
+namespace Modules\V021\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
 
-class V1ServiceProvider extends ServiceProvider
+class V021ServiceProvider extends ServiceProvider
 {
     /**
      * @var string $moduleName
      */
-    protected $moduleName = 'V1';
+    protected $moduleName = 'V021';
 
     /**
      * @var string $moduleNameLower
      */
-    protected $moduleNameLower = 'v1';
+    protected $moduleNameLower = 'v021';
 
     /**
      * Boot the application events.

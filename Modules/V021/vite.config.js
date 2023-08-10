@@ -6,14 +6,14 @@ import laravel from 'laravel-vite-plugin';
 
 export default defineConfig({
     build: {
-        outDir: '../../public/build-v1',
+        outDir: '../../public/build-v021',
         emptyOutDir: true,
         manifest: true,
     },
     plugins: [
         laravel({
             publicDirectory: '../../public',
-            buildDirectory: 'build-v1',
+            buildDirectory: 'build-v021',
             input: [
                 __dirname + '/Resources/assets/sass/app.scss',
                 __dirname + '/Resources/assets/js/app.js'

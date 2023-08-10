@@ -1,9 +1,8 @@
 <?php
 
-namespace Modules\V1\Http\Controllers\Auth;
+namespace Modules\V021\Http\Controllers\Auth;
 
 use App\Models\User;
-use App\Mail\OTP\Register;
 use App\Models\Otp\Otpcode;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -11,7 +10,7 @@ use App\Http\Resources\Respons;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Mail;
+use App\Models\Marketplace\UserMarket;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Contracts\Support\Renderable;
 
@@ -23,9 +22,8 @@ class LoginController extends Controller
             'email'  => 'required|email',
             'password' => 'required|min:6'
         ]);
-        if ($validator->fails()) {
-            return new Respons(false, 'Validation Failed', $validator->errors());
-        }
+        if ($validator->fails()) return new Respons(false, 'Validation Failed', $validator->errors());
+
 
 
         if (!Auth::attempt($req->only(['email','password']))) {
@@ -33,8 +31,15 @@ class LoginController extends Controller
         }
 
         $user = User::where('email', $req->email)->first();
-        $success['token'] =  $user->createToken($user->name)->plainTextToken;
-        return new Respons(true, 'Success Login', $success);
+        $userMarket = UserMarket::where('user_id_main',$user->id)->first();
+
+        $token=  $user->createToken($user->name)->plainTextToken;
+        $res = collect([
+            'number' => $user->id,
+            'market' =>$userMarket->user_id_market,
+            'token' =>$token,
+        ]);
+        return new Respons(true, 'Success Login', $res);
     }
 
     public function resetPasswordSendOtp(Request $req){

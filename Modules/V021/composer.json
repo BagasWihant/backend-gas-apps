@@ -1,5 +1,5 @@
 {
-    "name": "nwidart/v1",
+    "name": "nwidart/v021",
     "description": "",
     "authors": [
         {
@@ -17,7 +17,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Modules\\V1\\": ""
+            "Modules\\V021\\": ""
         }
     }
 }

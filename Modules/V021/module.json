@@ -1,11 +1,11 @@
 {
-    "name": "V1",
-    "alias": "v1",
+    "name": "V021",
+    "alias": "v021",
     "description": "",
     "keywords": [],
     "priority": 0,
     "providers": [
-        "Modules\\V1\\Providers\\V1ServiceProvider"
+        "Modules\\V021\\Providers\\V021ServiceProvider"
     ],
     "files": []
 }
