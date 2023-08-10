@@ -4,6 +4,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Modules\V1\Http\Controllers\Auth\LoginController;
 use Modules\V1\Http\Controllers\Auth\RegisterController;
+use Modules\V1\Http\Controllers\Home\HomeController;
+use Modules\V1\Http\Controllers\User\ProfileController;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,13 +18,10 @@ use Modules\V1\Http\Controllers\Auth\RegisterController;
 |
 */
 
-Route::prefix('v1')->group(function() {
+Route::prefix('v1')->group(function () {
 
-    Route::get('/registerSendOtp', function (){
-     return 'lskdalsdjlk';
-    });
     // register
-    Route::controller(RegisterController::class)->group(function (){
+    Route::controller(RegisterController::class)->group(function () {
         Route::post('/registerSendOtp', 'registerSendOtp');
         Route::post('/registerConfirmOtp', 'registerConfirmOtp');
         Route::post('/register', 'register');
@@ -38,7 +37,16 @@ Route::prefix('v1')->group(function() {
         Route::post('/resetPassword', 'resetPassword');
     });
 
+    // HARUS LOGIN DULU
+    Route::middleware('auth:sanctum')->group(function () {
+
+        Route::get('/homepage', [HomeController::class, 'home']);
+
+        // PROFILE
+        Route::get('/profile', [ProfileController::class, 'getData']);
+        Route::put('/profile', [ProfileController::class, 'update']);
+
+    });
+
 
 });
-
-
