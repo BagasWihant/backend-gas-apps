@@ -38,7 +38,7 @@ class RegisterController extends Controller
         $codeOTP = rand(1000, 9999);
         Otpcode::updateOrCreate(
             ['key' => $req->email],
-            ['otp' => $codeOTP, 'tipe' => 'REGISTER', 'valid' => $validUntil, 'status'=>0],
+            ['otp' => $codeOTP, 'tipe' => 'REGISTER', 'valid' => $validUntil, 'status' => 0],
         );
 
         $mailData = [
@@ -51,7 +51,7 @@ class RegisterController extends Controller
 
     public function registerConfirmOtp(Request $req)
     {
-        $validator = Validator::make($req->only('key','otp'), [
+        $validator = Validator::make($req->only('key', 'otp'), [
             'key' => 'required|unique:users,email',
             'otp' => 'required',
         ]);
@@ -59,7 +59,7 @@ class RegisterController extends Controller
             return new Respons(false, 'Validation Failed', $validator->errors());
         }
 
-        $otp = Otpcode::where(['key' => $req->key, 'otp' => $req->otp, 'status'=>0])->first();
+        $otp = Otpcode::where(['key' => $req->key, 'otp' => $req->otp, 'status' => 0])->first();
         if (!$otp) return new Respons(false, 'OTP Does Not Match');
 
         if (Carbon::now() > $otp->valid) return new Respons(false, 'OTP Timeout');
@@ -72,7 +72,7 @@ class RegisterController extends Controller
     public function register(Request $req)
     {
         // Validasi
-        $only = $req->only('name','email','password','phone');
+        $only = $req->only('name', 'email', 'password', 'phone');
         $validator = Validator::make($only, [
             'name' => 'required',
             'email' => 'required|email:filter,spoof,dns|unique:users,email',
@@ -98,21 +98,19 @@ class RegisterController extends Controller
                 'user_id_market' => $userMarketId,
             ]);
             // $otp->delete();
+
             DB::commit();
             $res = collect([
                 'number' => $userMain->id,
-                'market' =>$userMarketId,
+                'market' => $userMarketId,
+                'token' => $userMain->createToken($userMain->name)->plainTextToken,
+                'name' => $userMain->name,
             ]);
             return new Respons(true, 'Berhasil mendaftar', $res);
         } catch (\Throwable $th) {
             DB::rollBack();
             return new Respons(false, $th->errorInfo[2], $th);
         }
-
-        $res = new stdClass;
-        $res->token = $userMain->createToken($userMain->name)->plainTextToken;
-        $res->name =  $userMain->name;
-        return new Respons(true, 'Register Succesfully', $res);
     }
 
     public function registerGoogle()
