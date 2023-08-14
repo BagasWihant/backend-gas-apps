@@ -7,6 +7,7 @@ use Modules\V021\Http\Controllers\Auth\LoginController;
 use Modules\V021\Http\Controllers\User\AddressController;
 use Modules\V021\Http\Controllers\User\ProfileController;
 use Modules\V021\Http\Controllers\Auth\RegisterController;
+use Modules\V021\Http\Controllers\Store\StoreController;
 
 /*
 |--------------------------------------------------------------------------
@@ -51,7 +52,11 @@ Route::prefix('v021')->group(function () {
         });
 
         // ADDRESS
-        Route::resource('profile-address',AddressController::class);
+        Route::resources([
+            'profile-address'=> AddressController::class,
+        ]);
+        Route::post('create-store',[StoreController::class,'createStore']);
+
 
 
     });
