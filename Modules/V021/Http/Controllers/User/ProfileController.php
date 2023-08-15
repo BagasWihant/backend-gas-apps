@@ -7,7 +7,9 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Http\Resources\Respons;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Contracts\Support\Renderable;
 
@@ -49,10 +51,41 @@ class ProfileController extends Controller
 
             return new Respons(true, 'Update sukses');
         } catch (\Throwable $th) {
+
             $debug = config('app.debug');
-            if($debug) return new Respons(false, 'Update Gagal', $th);
+            if ($debug) return new Respons(false, 'Update Gagal', $th);
             return new Respons(false, 'Update Gagal');
         }
+    }
 
+    public function changeFoto(Request $req)
+    {
+        $userID = $req->user()->id;
+
+        $valid = Validator::make($req->only('img'),[
+            'img' => 'required|image|mimes:jpg,png,jpeg|max:2048'
+        ]);
+        if ($valid->fails()) return new Respons(false, 'Validation Failed', $valid->errors());
+
+        $path =  public_path('image/user_profile');
+        if (!File::exists($path)) File::makeDirectory($path, 0755, false, true);
+
+        // if (File::exists(public_path($this->category->image))) {
+        //     File::delete(public_path($this->category->image));
+        // }
+        try {
+            DB::beginTransaction();
+            $ext = $req->img->getClientOriginalExtension();
+            $name = $userID."_profile.$ext";
+            $req->img->move($path,$name);
+
+            User::find($userID)->update(['photo' => $name]);
+            DB::commit();
+            return new Respons(false,'Sukses Ganti foto');
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return new Respons(false,'Ganti foto gagal',$th->getMessage());
+            //throw $th;
+        }
     }
 }

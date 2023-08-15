@@ -49,12 +49,15 @@ Route::prefix('v021')->group(function () {
         Route::controller(ProfileController::class)->group(function (){
             Route::get('/profile', 'getData');
             Route::put('/profile', 'update');
+            Route::post('/profile-foto', 'changeFoto');
         });
 
         // ADDRESS
         Route::resources([
             'profile-address'=> AddressController::class,
         ]);
+
+
         Route::post('create-store',[StoreController::class,'createStore']);
 
 

@@ -3,19 +3,14 @@
 namespace Modules\V021\Http\Controllers\Store;
 
 use Carbon\Carbon;
-use App\Models\Store\Store;
-use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Http\Resources\Respons;
-use App\Models\Store\StoreDetail;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\File;
 
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Contracts\Support\Renderable;
 use Modules\V021\Http\Repositories\StoreRepo;
-
-use function PHPUnit\Framework\directoryExists;
 
 class StoreController extends Controller
 {
@@ -63,10 +58,10 @@ class StoreController extends Controller
         $rand = rand(1000, 9999);
         $store_id = $rand . substr($timestamp, 2);
 
-        $pathPictStore = public_path('image/pict_store');
+        $pathPictStore = public_path('image/store_profile');
         if (!File::exists($pathPictStore)) File::makeDirectory($pathPictStore, 0755, false, true);
 
-        $pathDetailStore = public_path('image/pict_store_detail');
+        $pathDetailStore = public_path('image/store_detail_pict');
         if (!File::exists($pathDetailStore)) File::makeDirectory($pathDetailStore, 0755, false, true);
 
         $allowed['data'] = collect([
@@ -83,4 +78,5 @@ class StoreController extends Controller
         return new Respons(true,'Berhasil mendaftarkan Toko');
 
     }
+
 }
