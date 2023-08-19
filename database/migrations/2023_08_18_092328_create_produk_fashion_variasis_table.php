@@ -18,8 +18,8 @@ return new class extends Migration
             $table->string('produk_id',32)->unique();
             $table->string('var_1',30)->nullable();
             $table->string('var_2',30)->nullable();
-            $table->int('harga',11);
-            $table->int('stok',11);
+            $table->integer('harga');
+            $table->integer('stok');
         });
     }
 

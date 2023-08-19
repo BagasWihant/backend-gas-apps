@@ -9,6 +9,8 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
+    protected $connection = 'mysql_market';
+
     public function up(): void
     {
         Schema::create('produk_fashion_images', function (Blueprint $table) {
