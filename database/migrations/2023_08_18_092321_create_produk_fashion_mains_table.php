@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('produk_id',32)->primary();
             $table->string('name');
             $table->text('desc');
-            $table->char('kategori',1)->comment('');
+            $table->string('kategori',30)->comment('');
             $table->char('gender',1)->comment('L/P');
             $table->char('kondisi',1)->comment('1=BARU 0=BEKAS');
             $table->string('variasi')->comment('variasi1;variasi2');

@@ -9,6 +9,6 @@ class ProdukFashionVariasi extends Model
 {
     use HasFactory;
     protected $connection = 'mysql_market';
-    protected $timestamps = false;
     protected $guarded = ['id'];
+    public $timestamps = false;
 }

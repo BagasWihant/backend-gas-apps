@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('produk_fashion_images', function (Blueprint $table) {
             $table->id();
-            $table->string('produk_id',32)->unique();
+            $table->string('produk_id',32)->index();
             $table->string('img',100);
 
         });
