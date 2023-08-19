@@ -4,10 +4,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Modules\V021\Http\Controllers\Home\HomeController;
 use Modules\V021\Http\Controllers\Auth\LoginController;
+use Modules\V021\Http\Controllers\Store\StoreController;
 use Modules\V021\Http\Controllers\User\AddressController;
 use Modules\V021\Http\Controllers\User\ProfileController;
 use Modules\V021\Http\Controllers\Auth\RegisterController;
-use Modules\V021\Http\Controllers\Store\StoreController;
+use Modules\V021\Http\Controllers\Produk\ProdukController;
 
 /*
 |--------------------------------------------------------------------------
@@ -57,8 +58,11 @@ Route::prefix('v021')->group(function () {
             'profile-address'=> AddressController::class,
         ]);
 
-
+        // REGISTER STORE
         Route::post('create-store',[StoreController::class,'createStore']);
+
+        // CREATE / SELL PRODUK
+        Route::post('create-produk',[ProdukController::class,'createProduk']);
 
 
 
