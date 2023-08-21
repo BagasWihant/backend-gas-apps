@@ -23,7 +23,7 @@ class GantiAkunRepo
     public function storeToUser($user)
     {
         try {
-            User::find($user->id)->update(['as_store' => null]);
+            User::find($user->id)->update(['as_store' => 0]);
             return true;
         } catch (\Throwable $th) {
             return false;

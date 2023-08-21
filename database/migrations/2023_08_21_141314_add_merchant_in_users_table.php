@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->char('as_store',1)->nullable()->default(null)
+            $table->char('as_store',1)->nullable()->default('0')
             ->after('tgl_lahir')->comment('1 : Login sbg toko');
         });
     }
