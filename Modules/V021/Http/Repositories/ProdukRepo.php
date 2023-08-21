@@ -19,9 +19,11 @@ class ProdukRepo
     {
         try {
             DB::beginTransaction();
+            $user_id = $data['user']->idMarket->user_id_market;
             // BUAT MAIN PRODUK
             ProdukFashionMain::create([
                 'produk_id' => $data['produk_id'],
+                'user_id_market' => $user_id,
                 'name' => $data['nama'],
                 'desc' => $data['deskripsi'],
                 'kategori' => $data['kategori'],
@@ -36,6 +38,7 @@ class ProdukRepo
                 $varian = explode(',', $produk['variant']);
                 ProdukFashionVariasi::create([
                     'produk_id' => $data['produk_id'],
+                    'user_id_market' => $user_id,
                     'var_1' => $varian[0],
                     'var_2' => $varian[1],
                     'harga' => $produk['harga'],
@@ -73,8 +76,10 @@ class ProdukRepo
         try {
             DB::beginTransaction();
 
+            $user_id = $data['user']->idMarket->user_id_market;
             ProdukKebutuhanPokokMain::create([
                 'produk_id' => $data['produk_id'],
+                'user_id_market' => $user_id,
                 'name' => $data['nama'],
                 'desc' => $data['deskripsi'],
                 'kategori' => $data['kategori'],
@@ -88,6 +93,7 @@ class ProdukRepo
                 $varian = ($data['varian'] === '-') ? ['', ''] : explode(',', $produk['variant']);
                 ProdukKebutuhanPokokVariasi::create([
                     'produk_id' => $data['produk_id'],
+                    'user_id_market' => $user_id,
                     'var_1' => $varian[0],
                     'var_2' => $varian[1],
                     'harga' => $produk['harga'],
@@ -116,7 +122,6 @@ class ProdukRepo
             return [true, 'Berhasil posting produk kebutuhan pokok'];
         } catch (\Throwable $th) {
             DB::rollBack();
-            dd($th->getMessage());
             return [false, $th->getMessage()];
         }
     }

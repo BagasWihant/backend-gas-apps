@@ -16,6 +16,7 @@ return new class extends Migration
         Schema::create('produk_fashion_variasis', function (Blueprint $table) {
             $table->id();
             $table->string('produk_id',32);
+            $table->string('user_id_market',12)->index();
             $table->string('var_1',30)->nullable();
             $table->string('var_2',30)->nullable();
             $table->integer('harga');
