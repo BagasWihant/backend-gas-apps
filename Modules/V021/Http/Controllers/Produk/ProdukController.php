@@ -60,6 +60,20 @@ class ProdukController extends Controller
         $allowed['produk_id'] = Str::upper($produkID);
         $allowed['user'] = $user;
 
+        if ($user->as_store === 0) {
+            $countInputProduk = count($allowed['produk']);
+
+            if ($countInputProduk > 10) {
+                return new Respons(false, 'User Maks hanya 10 varian produk');
+            }
+
+            $countProdDB = $this->produkRepo->totalProdukVarian($user->idMarket->user_id_market);
+
+            if (($countProdDB + $countInputProduk) > 10) {
+                return new Respons(false, 'User Maks hanya total 10 varian produk');
+            }
+        }
+
         if ($jenis == 'F') {
 
             $validator2 = Validator::make($allowed, [
@@ -81,7 +95,7 @@ class ProdukController extends Controller
             $res = $this->produkRepo->createProdukHarian($allowed);
 
         }
-        if(!$res[0]) return new Respons(false,'Gagal memposting produk');
+        if(!$res[0]) return new Respons(false,$res[1]);
 
         return new Respons(true,'Berhasil memposting produk');
     }

@@ -35,6 +35,11 @@ class ProdukRepo
 
             // BUAT PRODUK VARIAN
             foreach ($data['produk'] as $produk) {
+
+                if ($data['user']->as_store == 0 && $produk['stok'] > 2) {
+                    return [false, 'User maksimal 2 Stok per produk'];
+                }
+
                 $varian = explode(',', $produk['variant']);
                 ProdukFashionVariasi::create([
                     'produk_id' => $data['produk_id'],
@@ -66,7 +71,8 @@ class ProdukRepo
             return [true, 'Berhasil memposting produk fashion'];
         } catch (\Throwable $th) {
             DB::rollBack();
-            return [false, $th->getMessage()];
+            // return [false, $th->getMessage()];
+            return [false, 'Ada kesalahan memposting produk'];
             //throw $th;
         }
     }
@@ -124,5 +130,11 @@ class ProdukRepo
             DB::rollBack();
             return [false, $th->getMessage()];
         }
+    }
+
+    public function totalProdukVarian($user_id)
+    {
+        $t = ProdukFashionVariasi::where('user_id_market',$user_id)->count();
+        return $t;
     }
 }
