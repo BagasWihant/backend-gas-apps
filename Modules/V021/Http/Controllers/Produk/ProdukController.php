@@ -35,15 +35,14 @@ class ProdukController extends Controller
             'varian',
             'produk',
             'foto',
+            'expired'
         );
 
         $validator = Validator::make($allowed, [
             'nama' => 'required|string',
             'jenis_produk' => 'required', // nanti hanya di ijinkan 1 / 2 saja
             'deskripsi' => 'required|string',
-            'gender' => 'required',
             'kategori' => 'required',
-            'kondisi' => 'required',
             'berat' => 'required',
             'produk' => 'required',
             'foto.*' => 'required|image|mimes:jpg,png,jpeg|max:2048',
@@ -52,19 +51,38 @@ class ProdukController extends Controller
 
         $hextime = dechex($timestamp);
         $hexid = dechex($user->id);
-        $kat = substr($allowed['kategori'],0,2);
+        // $kat = substr($allowed['kategori'], 0, 2);
+        $kat = $allowed['kategori'];
         $jenis = $allowed['jenis_produk'] == 1 ? 'F' : 'K';
         $produkID = $jenis . $kat . $hexid . $hextime;
 
-        $allowed['berat'] = explode(' ',$allowed['berat']);
+        $allowed['berat'] = explode(' ', $allowed['berat']);
         $allowed['produk_id'] = Str::upper($produkID);
         $allowed['user'] = $user;
 
         if ($jenis == 'F') {
-            $this->produkRepo->createProdukFashion($allowed);
-        } elseif ($jenis == 'K') {
-            $this->produkRepo->createHarian($produkID);
-        }
 
+            $validator2 = Validator::make($allowed, [
+                'gender' => 'required',
+                'kondisi' => 'required',
+            ]);
+            if ($validator2->fails()) return new Respons(false, 'Validation Failed', $validator2->errors());
+
+            $res = $this->produkRepo->createProdukFashion($allowed);
+
+        } elseif ($jenis == 'K') {
+
+            $validator2 = Validator::make($allowed, [
+                'expired' => 'required|date',
+            ]);
+            if ($validator2->fails()) return new Respons(false, 'Validation Failed', $validator2->errors());
+
+            $allowed['expired'] = date('Y-m-d',strtotime($allowed['expired']));
+            $res = $this->produkRepo->createProdukHarian($allowed);
+
+        }
+        if(!$res[0]) return new Respons(false,'Gagal memposting produk');
+
+        return new Respons(true,'Berhasil memposting produk');
     }
 }
