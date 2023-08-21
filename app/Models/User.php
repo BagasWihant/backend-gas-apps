@@ -26,7 +26,8 @@ class User extends Authenticatable
         'jenis_kelamin',
         'tgl_lahir',
         'photo',
-        'phone'
+        'phone',
+        'as_store'
     ];
 
     /**

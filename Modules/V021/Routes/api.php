@@ -9,6 +9,7 @@ use Modules\V021\Http\Controllers\User\AddressController;
 use Modules\V021\Http\Controllers\User\ProfileController;
 use Modules\V021\Http\Controllers\Auth\RegisterController;
 use Modules\V021\Http\Controllers\Produk\ProdukController;
+use Modules\V021\Http\Controllers\Utility\GantiAkunController;
 
 /*
 |--------------------------------------------------------------------------
@@ -47,7 +48,7 @@ Route::prefix('v021')->group(function () {
         Route::get('/homepage', [HomeController::class, 'home']);
 
         // PROFILE
-        Route::controller(ProfileController::class)->group(function (){
+        Route::controller(ProfileController::class)->group(function () {
             Route::get('/profile', 'getData');
             Route::put('/profile', 'update');
             Route::post('/profile-foto', 'changeFoto');
@@ -55,18 +56,17 @@ Route::prefix('v021')->group(function () {
 
         // ADDRESS
         Route::resources([
-            'profile-address'=> AddressController::class,
+            'profile-address' => AddressController::class,
         ]);
 
         // REGISTER STORE
-        Route::post('create-store',[StoreController::class,'createStore']);
+        Route::post('create-store', [StoreController::class, 'createStore']);
 
         // CREATE / SELL PRODUK
-        Route::post('create-produk',[ProdukController::class,'createProduk']);
+        Route::post('create-produk', [ProdukController::class, 'createProduk']);
 
-
-
+        // GANTI AKUN
+        Route::patch('user-to-store', [GantiAkunController::class, 'userToStore']);
+        Route::patch('store-to-user', [GantiAkunController::class, 'storeToUser']);
     });
-
-
 });
