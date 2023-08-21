@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('produk_fashion_mains', function (Blueprint $table) {
             $table->string('produk_id',32)->primary();
+            $table->string('user_id_market',12)->index();
             $table->string('name');
             $table->text('desc');
             $table->string('kategori',30)->comment('');
