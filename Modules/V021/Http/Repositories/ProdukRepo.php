@@ -10,6 +10,9 @@ use App\Models\Produk\Fashion\ProdukFashionVariasi;
 use App\Models\Produk\KebutuhanPokok\ProdukKebutuhanPokokImage;
 use App\Models\Produk\KebutuhanPokok\ProdukKebutuhanPokokMain;
 use App\Models\Produk\KebutuhanPokok\ProdukKebutuhanPokokVariasi;
+use App\Models\Produk\UserBasic\ProdukUserImage;
+use App\Models\Produk\UserBasic\ProdukUserMain;
+use App\Models\Produk\UserBasic\ProdukUserVariasi;
 use Illuminate\Support\Facades\DB;
 
 class ProdukRepo
@@ -18,7 +21,7 @@ class ProdukRepo
     public function createProdukFashion($data)
     {
         try {
-            DB::beginTransaction();
+            DB::connection('mysql_market')->beginTransaction();
             $user_id = $data['user']->idMarket->user_id_market;
             // BUAT MAIN PRODUK
             ProdukFashionMain::create([
@@ -35,12 +38,8 @@ class ProdukRepo
 
             // BUAT PRODUK VARIAN
             foreach ($data['produk'] as $produk) {
+                $varian = ($data['varian'] === '-') ? ['', ''] : explode(',', $produk['variant']);
 
-                if ($data['user']->as_store == 0 && $produk['stok'] > 2) {
-                    return [false, 'User maksimal 2 Stok per produk'];
-                }
-
-                $varian = explode(',', $produk['variant']);
                 ProdukFashionVariasi::create([
                     'produk_id' => $data['produk_id'],
                     'user_id_market' => $user_id,
@@ -67,11 +66,13 @@ class ProdukRepo
                 ]);
                 $urut++;
             }
-            DB::commit();
+
+            DB::connection('mysql_market')->commit();
+
             return [true, 'Berhasil memposting produk fashion'];
         } catch (\Throwable $th) {
-            DB::rollBack();
-            // return [false, $th->getMessage()];
+            DB::connection('mysql_market')->rollBack();
+
             return [false, 'Ada kesalahan memposting produk'];
             //throw $th;
         }
@@ -80,7 +81,7 @@ class ProdukRepo
     public function createProdukHarian($data)
     {
         try {
-            DB::beginTransaction();
+            DB::connection('mysql_market')->beginTransaction();
 
             $user_id = $data['user']->idMarket->user_id_market;
             ProdukKebutuhanPokokMain::create([
@@ -124,17 +125,97 @@ class ProdukRepo
                 $urut++;
             }
 
-            DB::commit();
+            DB::connection('mysql_market')->commit();
             return [true, 'Berhasil posting produk kebutuhan pokok'];
         } catch (\Throwable $th) {
-            DB::rollBack();
+            DB::connection('mysql_market')->rollBack();
             return [false, $th->getMessage()];
         }
     }
 
+    public function createProdukNotStore($data)
+    {
+
+        try {
+            DB::connection('mysql_market')->beginTransaction();
+
+            $user_id = $data['user']->idMarket->user_id_market;
+
+            $createData = [
+                'produk_id' => $data['produk_id'],
+                'jenis' => $data['jenis_produk'],
+                'user_id_market' => $user_id,
+                'name' => $data['nama'],
+                'desc' => $data['deskripsi'],
+                'kategori' => $data['kategori'],
+                'variasi' => $data['varian'],
+                'berat' => $data['berat'][0] . '.' . $data['berat'][1],
+            ];
+
+            if ($data['jenis_produk'] == 1) {
+                $createData['gender'] = $data['gender'];
+                $createData['kondisi'] = $data['kondisi'];
+            } elseif ($data['jenis_produk'] == 2) {
+                $createData['expired'] = $data['expired'];
+            }
+
+            ProdukUserMain::create($createData);
+
+            // SIMPAN VARIAN PRODUK
+            foreach ($data['produk'] as $produk) {
+
+                if ($data['user']->as_store == 0 && $produk['stok'] > 2) {
+                    DB::connection('mysql_market')->rollBack();
+                    return [false, 'User maksimal 2 Stok per produk'];
+                }
+
+                $varian = ($data['varian'] === '-') ? ['', ''] : explode(',', $produk['variant']);
+
+                ProdukUserVariasi::create([
+                    'produk_id' => $data['produk_id'],
+                    'user_id_market' => $user_id,
+                    'var_1' => $varian[0],
+                    'var_2' => $varian[1],
+                    'harga' => $produk['harga'],
+                    'stok' => $produk['stok'],
+                ]);
+            }
+
+            // SIMPAN GAMBAR PRODUK
+            $urut = 0;
+            $path = public_path('image/produk/bukan_toko');
+            if (!File::exists($path)) File::makeDirectory($path, 0755, false, true);
+
+            foreach ($data['foto'] as $foto) {
+                $ext = $foto->getClientOriginalExtension();
+                $fileName = $data['produk_id'] . '_' . $urut . '.' . $ext;
+
+                $foto->move($path, $fileName);
+
+                ProdukUserImage::create([
+                    'produk_id' => $data['produk_id'],
+                    'img' => $fileName
+                ]);
+                $urut++;
+            }
+
+            DB::connection('mysql_market')->commit();
+            return [true, 'Berhasil memposting produk'];
+        } catch (\Throwable $th) {
+            //throw $th;
+            DB::connection('mysql_market')->rollBack();
+            return [false, $th->getMessage()];
+        }
+    }
+
+    public function migrateProdukToStore($user){
+        $user_id = $user->idMarket->user_id_market;
+        $produk = ProdukUserMain::where('user_id_market',$user_id)->get();
+    }
+
     public function totalProdukVarian($user_id)
     {
-        $t = ProdukFashionVariasi::where('user_id_market',$user_id)->count();
+        $t = ProdukFashionVariasi::where('user_id_market', $user_id)->count();
         return $t;
     }
 }
