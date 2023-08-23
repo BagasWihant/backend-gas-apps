@@ -52,13 +52,13 @@ class ProdukRepo
 
             // BUAT PRODUK VARIAN
             foreach ($data['produk'] as $produk) {
-                $varian = ($data['varian'] === '-') ? ['', ''] : explode(',', $produk['variant']);
+                $varian = ($data['varian'] === '-') ? ['', ''] : explode(',', $produk['variasi']);
 
                 ProdukFashionVariasi::create([
                     'produk_id' => $data['produk_id'],
                     'user_id_market' => $user_id,
                     'var_1' => $varian[0],
-                    'var_2' => $varian[1],
+                    'var_2' => isset($varian[1]) ? $varian[1] : '',
                     'harga' => $produk['harga'],
                     'stok' => $produk['stok'],
                 ]);
@@ -161,12 +161,12 @@ class ProdukRepo
 
                 // VARIASI
                 foreach ($data['produk'] as $produk) {
-                    $varian = ($data['varian'] === '-') ? ['', ''] : explode(',', $produk['variant']);
+                    $varian = ($data['varian'] === '-') ? ['', ''] : explode(',', $produk['variasi']);
                     $variasiData = [
                         'produk_id' => $data['produk_id'],
                         'user_id_market' => $user_id,
                         'var_1' => $varian[0],
-                        'var_2' => $varian[1],
+                        'var_2' => isset($varian[1]) ? $varian[1] : '',
                         'harga' => $produk['harga'],
                         'stok' => $produk['stok'],
                     ];
@@ -238,13 +238,13 @@ class ProdukRepo
                     return [false, 'User maksimal 2 Stok per produk'];
                 }
 
-                $varian = ($data['varian'] === '-') ? ['', ''] : explode(',', $produk['variant']);
+                $varian = ($data['varian'] === '-') ? ['', ''] : explode(',', $produk['variasi']);
 
                 ProdukUserVariasi::create([
                     'produk_id' => $data['produk_id'],
                     'user_id_market' => $user_id,
                     'var_1' => $varian[0],
-                    'var_2' => $varian[1],
+                    'var_2' => isset($varian[1]) ? $varian[1] : '',
                     'harga' => $produk['harga'],
                     'stok' => $produk['stok'],
                 ]);
@@ -285,7 +285,7 @@ class ProdukRepo
 
     public function totalProdukVarian($user_id)
     {
-        $t = ProdukFashionVariasi::where('user_id_market', $user_id)->count();
+        $t = ProdukUserVariasi::where('user_id_market', $user_id)->count();
         return $t;
     }
 }

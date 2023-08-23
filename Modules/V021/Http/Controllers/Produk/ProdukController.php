@@ -60,16 +60,6 @@ class ProdukController extends Controller
         $allowed['produk_id'] = Str::upper($produkID);
         $allowed['user'] = $user;
 
-        if ($user->as_store === 0) {
-            $countInputProduk = count($allowed['produk']);
-            if ($countInputProduk > 10) {
-                return new Respons(false, 'User Maks hanya 10 varian produk');
-            }
-            $countProdDB = $this->produkRepo->totalProdukVarian($user->idMarket->user_id_market);
-            if (($countProdDB + $countInputProduk) > 10) {
-                return new Respons(false, 'User Maks hanya total 10 varian produk');
-            }
-        }
 
         $validatorRules = [
             'F' => ['gender' => 'required', 'kondisi' => 'required'],
@@ -85,8 +75,20 @@ class ProdukController extends Controller
             $allowed['expired'] = date('Y-m-d', strtotime($allowed['expired']));
         }
 
+        // USER BIASA TIDAK MEMILIKI TOKO
         if ($user->as_store == 0) {
-            // USER BIASA TIDAK MEMILIKI TOKO
+            $countInputProduk = count($allowed['produk']);
+
+            if ($countInputProduk > 10) {
+                return new Respons(false, 'User maksimal hanya 10 varian per produk');
+            }
+
+            $countProdDB = $this->produkRepo->totalProdukVarian($user->idMarket->user_id_market);
+
+            if (($countProdDB + $countInputProduk) > 10) {
+                return new Respons(false, 'User maksimal hanya bisa membuat total 10 produk ');
+            }
+
             $res = $this->produkRepo->createProdukNotStore($allowed);
         } else {
             switch ($jenis) {
