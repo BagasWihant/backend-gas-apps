@@ -10,19 +10,20 @@ use App\Models\Produk\Mandi\ProdukMandiMain;
 use App\Models\Produk\Bumbu\ProdukBumbuImage;
 use App\Models\Produk\Mandi\ProdukMandiImage;
 use App\Models\Produk\Bumbu\ProdukBumbuVariasi;
+use App\Models\Produk\Mandi\ProdukMandiVariasi;
 use App\Models\Produk\UserBasic\ProdukUserMain;
-use App\Models\Produk\UserBasic\ProdukUserImage;
-use App\Models\Produk\UserBasic\ProdukUserVariasi;
 use App\Models\Produk\Fashion\ProdukFashionMain;
+use App\Models\Produk\UserBasic\ProdukUserImage;
 use App\Models\Produk\Fashion\ProdukFashionImage;
-use App\Models\Produk\Fashion\ProdukFashionVariasi;
 use App\Models\Produk\Kosmetik\ProdukKosmetikMain;
+use App\Models\Produk\UserBasic\ProdukUserVariasi;
+use App\Models\Produk\Fashion\ProdukFashionVariasi;
 use App\Models\Produk\Kosmetik\ProdukKosmetikImage;
-use App\Models\Produk\Kosmetik\ProdukKosmetikVariasi;
 use App\Models\Produk\BuahSayur\ProdukBuahSayurMain;
 use App\Models\Produk\BuahSayur\ProdukBuahSayurImage;
-use App\Models\Produk\BuahSayur\ProdukBuahSayurVariasi;
+use App\Models\Produk\Kosmetik\ProdukKosmetikVariasi;
 use App\Models\Produk\MakanMinum\ProdukMakanMinumMain;
+use App\Models\Produk\BuahSayur\ProdukBuahSayurVariasi;
 use App\Models\Produk\MakanMinum\ProdukMakanMinumImage;
 use App\Models\Produk\MakanMinum\ProdukMakanMinumVariasi;
 use App\Models\Produk\KebutuhanPokok\ProdukKebutuhanPokokMain;
@@ -36,19 +37,6 @@ class ProdukRepo
     {
         try {
             DB::connection('mysql_market')->beginTransaction();
-            $user_id = $data['user']->idMarket->user_id_market;
-            // BUAT MAIN PRODUK
-            ProdukFashionMain::create([
-                'produk_id' => $data['produk_id'],
-                'user_id_market' => $user_id,
-                'name' => $data['nama'],
-                'deskripsi' => $data['deskripsi'],
-                'kategori' => $data['kategori'],
-                'gender' => $data['gender'],
-                'kondisi' => $data['kondisi'],
-                'variasi' => $data['varian'],
-                'berat' => $data['berat'][0] . '.' . $data['berat'][1],
-            ]);
 
             // BUAT PRODUK VARIAN
             foreach ($data['produk'] as $produk) {
@@ -56,7 +44,7 @@ class ProdukRepo
 
                 ProdukFashionVariasi::create([
                     'produk_id' => $data['produk_id'],
-                    'user_id_market' => $user_id,
+                    'user_id_market' => $data['user_id'],
                     'var_1' => $varian[0],
                     'var_2' => isset($varian[1]) ? $varian[1] : '',
                     'harga' => $produk['harga'],
@@ -68,10 +56,11 @@ class ProdukRepo
             $urut = 0;
             $path = public_path('image/produk/fashion');
             if (!File::exists($path)) File::makeDirectory($path, 0755, false, true);
-
-            foreach ($data['foto'] as $foto) {
+            $preview = '';
+            foreach ($data['img'] as $foto) {
                 $ext = $foto->getClientOriginalExtension();
                 $fileName = $data['produk_id'] . '_' . $urut . '.' . $ext;
+                if ($urut == 0) $preview = $fileName;
                 $foto->move($path, $fileName);
 
                 ProdukFashionImage::create([
@@ -81,13 +70,29 @@ class ProdukRepo
                 $urut++;
             }
 
+            // BUAT MAIN PRODUK
+            ProdukFashionMain::create([
+                'produk_id' => $data['produk_id'],
+                'user_id_market' => $data['user_id'],
+                'name' => $data['nama'],
+                'deskripsi' => $data['deskripsi'],
+                'kategori' => $data['kategori'],
+                'gender' => $data['gender'],
+                'kondisi' => $data['kondisi'],
+                'variasi' => $data['varian'],
+                'berat' => $data['berat'][0] . '.' . $data['berat'][1],
+                'img' => $preview
+            ]);
+
+
             DB::connection('mysql_market')->commit();
 
             return [true, 'Berhasil memposting produk fashion'];
         } catch (\Throwable $th) {
             DB::connection('mysql_market')->rollBack();
-
-            return [false, 'Ada kesalahan memposting produk'];
+            dd($th);
+            return [false, $th->getMessage()];
+            // return [false, 'Ada kesalahan memposting produk'];
             //throw $th;
         }
     }
@@ -97,7 +102,7 @@ class ProdukRepo
         try {
             DB::connection('mysql_market')->beginTransaction();
 
-            $user_id = $data['user']->idMarket->user_id_market;
+
 
             $kategoriClasses = [
                 1 => [
@@ -146,25 +151,12 @@ class ProdukRepo
                 $imageClass = $kategoriClasses[$kategori]['image'];
                 $folder = $kategoriClasses[$kategori]['folder'];
 
-                // Create instances using the classes
-                $mainData = [
-                    'produk_id' => $data['produk_id'],
-                    'user_id_market' => $user_id,
-                    'name' => $data['nama'],
-                    'deskripsi' => $data['deskripsi'],
-                    'kategori' => $data['kategori'],
-                    'expired' => $data['expired'],
-                    'variasi' => $data['varian'],
-                    'berat' => $data['berat'][0] . '.' . $data['berat'][1],
-                ];
-                $mainClass::create($mainData);
-
                 // VARIASI
                 foreach ($data['produk'] as $produk) {
                     $varian = ($data['varian'] === '-') ? ['', ''] : explode(',', $produk['variasi']);
                     $variasiData = [
                         'produk_id' => $data['produk_id'],
-                        'user_id_market' => $user_id,
+                        'user_id_market' => $data['user_id'],
                         'var_1' => $varian[0],
                         'var_2' => isset($varian[1]) ? $varian[1] : '',
                         'harga' => $produk['harga'],
@@ -175,12 +167,13 @@ class ProdukRepo
 
                 // GAMBAR PRODUK
                 $urut = 0;
-                $path = public_path('image/produk/'.$folder);
+                $path = public_path('image/produk/' . $folder);
                 if (!File::exists($path)) File::makeDirectory($path, 0755, false, true);
-
-                foreach ($data['foto'] as $foto) {
+                $preview = '';
+                foreach ($data['img'] as $foto) {
                     $ext = $foto->getClientOriginalExtension();
                     $fileName = $data['produk_id'] . '_' . $urut . '.' . $ext;
+                    if ($urut == 0) $preview = $fileName;
                     $foto->move($path, $fileName);
 
                     $imageData = [
@@ -190,6 +183,20 @@ class ProdukRepo
                     $imageClass::create($imageData);
                     $urut++;
                 }
+
+                // Create instances using the classes
+                $mainData = [
+                    'produk_id' => $data['produk_id'],
+                    'user_id_market' => $data['user_id'],
+                    'name' => $data['nama'],
+                    'deskripsi' => $data['deskripsi'],
+                    'kategori' => $data['kategori'],
+                    'expired' => $data['expired'],
+                    'variasi' => $data['varian'],
+                    'berat' => $data['berat'][0] . '.' . $data['berat'][1],
+                    'img' => $preview
+                ];
+                $mainClass::create($mainData);
             } else {
                 return new Respons(false, 'Kategori ini tidak ada');
             }
@@ -208,12 +215,12 @@ class ProdukRepo
         try {
             DB::connection('mysql_market')->beginTransaction();
 
-            $user_id = $data['user']->idMarket->user_id_market;
+
 
             $createData = [
                 'produk_id' => $data['produk_id'],
                 'jenis' => $data['jenis_produk'],
-                'user_id_market' => $user_id,
+                'user_id_market' => $data['user_id'],
                 'name' => $data['nama'],
                 'deskripsi' => $data['deskripsi'],
                 'kategori' => $data['kategori'],
@@ -242,7 +249,7 @@ class ProdukRepo
 
                 ProdukUserVariasi::create([
                     'produk_id' => $data['produk_id'],
-                    'user_id_market' => $user_id,
+                    'user_id_market' => $data['user_id'],
                     'var_1' => $varian[0],
                     'var_2' => isset($varian[1]) ? $varian[1] : '',
                     'harga' => $produk['harga'],
@@ -255,7 +262,7 @@ class ProdukRepo
             $path = public_path('image/produk/bukan_toko');
             if (!File::exists($path)) File::makeDirectory($path, 0755, false, true);
 
-            foreach ($data['foto'] as $foto) {
+            foreach ($data['img'] as $foto) {
                 $ext = $foto->getClientOriginalExtension();
                 $fileName = $data['produk_id'] . '_' . $urut . '.' . $ext;
 
@@ -277,9 +284,8 @@ class ProdukRepo
         }
     }
 
-    public function migrateProdukToStore($user)
+    public function migrateProdukToStore($user_id)
     { //BELUM SELESAI
-        $user_id = $user->idMarket->user_id_market;
         $produk = ProdukUserMain::where('user_id_market', $user_id)->get();
     }
 

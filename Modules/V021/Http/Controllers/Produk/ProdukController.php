@@ -26,6 +26,7 @@ class ProdukController extends Controller
 
         $allowed = $req->only(
             'nama',
+            'img',
             'jenis_produk',
             'deskripsi',
             'gender',
@@ -34,18 +35,17 @@ class ProdukController extends Controller
             'berat',
             'varian',
             'produk',
-            'foto',
             'expired'
         );
 
-        $validator = Validator::make($allowed, [
+        $validator = Validator::make($req->all(), [
             'nama' => 'required|string',
             'jenis_produk' => 'required', // nanti hanya di ijinkan 1 / 2 saja
             'deskripsi' => 'required|string',
             'kategori' => 'required',
             'berat' => 'required',
             'produk' => 'required',
-            'foto.*' => 'required|image|mimes:jpg,png,jpeg|max:2048',
+            'img.*' => 'image|mimes:jpeg,png,jpg|max:2048|required',
         ]);
         if ($validator->fails()) return new Respons(false, 'Validation Failed', $validator->errors());
 
@@ -58,7 +58,7 @@ class ProdukController extends Controller
 
         $allowed['berat'] = explode(' ', $allowed['berat']);
         $allowed['produk_id'] = Str::upper($produkID);
-        $allowed['user'] = $user;
+        $allowed['user_id'] = $user->idMarket->user_id_market;
 
 
         $validatorRules = [

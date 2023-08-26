@@ -8,6 +8,7 @@ use Modules\V021\Http\Controllers\Store\StoreController;
 use Modules\V021\Http\Controllers\User\AddressController;
 use Modules\V021\Http\Controllers\User\ProfileController;
 use Modules\V021\Http\Controllers\Auth\RegisterController;
+use Modules\V021\Http\Controllers\Explore\CariBarangController;
 use Modules\V021\Http\Controllers\Produk\ProdukController;
 use Modules\V021\Http\Controllers\Utility\GantiAkunController;
 
@@ -41,6 +42,10 @@ Route::prefix('v021')->group(function () {
         Route::post('/resetPasswordConfirmOtp', 'resetPasswordConfirmOtp');
         Route::post('/resetPassword', 'resetPassword');
     });
+
+
+    // EXPLORE cari barang
+    Route::get('/find/{key}', [CariBarangController::class, 'index']);
 
     // HARUS LOGIN DULU
     Route::middleware('auth:sanctum')->group(function () {
