@@ -11,7 +11,7 @@ class GantiAkunRepo
     public function userToStore($user)
     {
         try {
-            $market = Store::where('user_id_market',$user->id)->first();
+            $market = Store::where('user_id_market',$user->idMarket->user_id_market)->first();
             if(!$market) return false;
 
             User::find($user->id)->update(['as_store' => 1]);
