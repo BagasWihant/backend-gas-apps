@@ -215,8 +215,6 @@ class ProdukRepo
         try {
             DB::connection('mysql_market')->beginTransaction();
 
-
-
             $createData = [
                 'produk_id' => $data['produk_id'],
                 'jenis' => $data['jenis_produk'],
@@ -235,7 +233,6 @@ class ProdukRepo
                 $createData['expired'] = $data['expired'];
             }
 
-            ProdukUserMain::create($createData);
 
             // SIMPAN VARIAN PRODUK
             foreach ($data['produk'] as $produk) {
@@ -258,13 +255,14 @@ class ProdukRepo
             }
 
             // SIMPAN GAMBAR PRODUK
-            $urut = 0;
+            $urut = 0; $preview ='';
             $path = public_path('image/produk/bukan_toko');
             if (!File::exists($path)) File::makeDirectory($path, 0755, false, true);
 
             foreach ($data['img'] as $foto) {
                 $ext = $foto->getClientOriginalExtension();
                 $fileName = $data['produk_id'] . '_' . $urut . '.' . $ext;
+                if ($urut == 0) $preview = $fileName;
 
                 $foto->move($path, $fileName);
 
@@ -275,7 +273,11 @@ class ProdukRepo
                 $urut++;
             }
 
+            $createData['img'] = $preview;
+            ProdukUserMain::create($createData);
+
             DB::connection('mysql_market')->commit();
+
             return [true, 'Berhasil memposting produk'];
         } catch (\Throwable $th) {
             //throw $th;

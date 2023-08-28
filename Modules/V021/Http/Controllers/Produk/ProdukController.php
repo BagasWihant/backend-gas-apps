@@ -88,6 +88,7 @@ class ProdukController extends Controller
             if (($countProdDB + $countInputProduk) > 10) {
                 return new Respons(false, 'User maksimal hanya bisa membuat total 10 produk ');
             }
+            $allowed['user'] = $user;
 
             $res = $this->produkRepo->createProdukNotStore($allowed);
         } else {
