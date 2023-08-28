@@ -3,6 +3,7 @@
 namespace Modules\V021\Http\Repositories;
 
 use App\Models\Marketplace\UserMarket;
+use App\Models\Store\Store;
 use App\Models\User;
 
 class GantiAkunRepo
@@ -10,7 +11,7 @@ class GantiAkunRepo
     public function userToStore($user)
     {
         try {
-            $market = UserMarket::where('user_id_main',$user->id)->first();
+            $market = Store::where('user_id_market',$user->id)->first();
             if(!$market) return false;
 
             User::find($user->id)->update(['as_store' => 1]);
