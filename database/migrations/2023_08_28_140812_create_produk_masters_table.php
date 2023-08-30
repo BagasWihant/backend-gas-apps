@@ -14,7 +14,7 @@ return new class extends Migration
     {
         Schema::create('produk_masters', function (Blueprint $table) {
             $table->string('produk_id', 32)->primary();
-            $table->string('name');
+            $table->string('name')->fulltext('name');
             $table->float('rating', 3, 1)->default(0);
             $table->string('img', 50);
             $table->integer('harga');
