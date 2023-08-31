@@ -29,18 +29,23 @@ use App\Models\Produk\MakanMinum\ProdukMakanMinumVariasi;
 use App\Models\Produk\KebutuhanPokok\ProdukKebutuhanPokokMain;
 use App\Models\Produk\KebutuhanPokok\ProdukKebutuhanPokokImage;
 use App\Models\Produk\KebutuhanPokok\ProdukKebutuhanPokokVariasi;
+use App\Models\Produk\ProdukMaster;
 
 class ProdukRepo
 {
-
     public function createProdukFashion($data)
     {
         try {
             DB::connection('mysql_market')->beginTransaction();
 
             // BUAT PRODUK VARIAN
+            $harga = null;
             foreach ($data['produk'] as $produk) {
                 $varian = ($data['varian'] === '-') ? ['', ''] : explode(',', $produk['variasi']);
+
+                if ($harga === null || $produk['harga'] < $harga) {
+                    $harga = $produk['harga'];
+                }
 
                 ProdukFashionVariasi::create([
                     'produk_id' => $data['produk_id'],
@@ -71,7 +76,7 @@ class ProdukRepo
             }
 
             // BUAT MAIN PRODUK
-            ProdukFashionMain::create([
+            $mainData = [
                 'produk_id' => $data['produk_id'],
                 'user_id_market' => $data['user_id'],
                 'name' => $data['nama'],
@@ -81,16 +86,16 @@ class ProdukRepo
                 'kondisi' => $data['kondisi'],
                 'variasi' => $data['varian'],
                 'berat' => $data['berat'][0] . '.' . $data['berat'][1],
-                'img' => $preview
-            ]);
+            ];
+            ProdukFashionMain::create($mainData);
 
+            $this->InsertProdukMasterSearch($mainData, $harga, $preview);
 
             DB::connection('mysql_market')->commit();
 
             return [true, 'Berhasil memposting produk fashion'];
         } catch (\Throwable $th) {
             DB::connection('mysql_market')->rollBack();
-            dd($th);
             return [false, $th->getMessage()];
             // return [false, 'Ada kesalahan memposting produk'];
             //throw $th;
@@ -101,8 +106,6 @@ class ProdukRepo
     {
         try {
             DB::connection('mysql_market')->beginTransaction();
-
-
 
             $kategoriClasses = [
                 1 => [
@@ -152,7 +155,14 @@ class ProdukRepo
                 $folder = $kategoriClasses[$kategori]['folder'];
 
                 // VARIASI
+                $harga = null;
                 foreach ($data['produk'] as $produk) {
+
+                    if ($harga === null || $produk['harga'] < $harga) {
+                        $harga = $produk['harga'];
+                    }
+
+
                     $varian = ($data['varian'] === '-') ? ['', ''] : explode(',', $produk['variasi']);
                     $variasiData = [
                         'produk_id' => $data['produk_id'],
@@ -194,11 +204,11 @@ class ProdukRepo
                     'expired' => $data['expired'],
                     'variasi' => $data['varian'],
                     'berat' => $data['berat'][0] . '.' . $data['berat'][1],
-                    'img' => $preview
                 ];
                 $mainClass::create($mainData);
+                $this->InsertProdukMasterSearch($mainData, $harga, $preview);
             } else {
-                return new Respons(false, 'Kategori ini tidak ada');
+                return [false, 'Kategori ini tidak ada'];
             }
 
             DB::connection('mysql_market')->commit();
@@ -235,6 +245,7 @@ class ProdukRepo
 
 
             // SIMPAN VARIAN PRODUK
+            $harga = null;
             foreach ($data['produk'] as $produk) {
 
                 if ($data['user']->as_store == 0 && $produk['stok'] > 2) {
@@ -242,8 +253,11 @@ class ProdukRepo
                     return [false, 'User maksimal 2 Stok per produk'];
                 }
 
-                $varian = ($data['varian'] === '-') ? ['', ''] : explode(',', $produk['variasi']);
+                if ($harga === null || $produk['harga'] < $harga) {
+                    $harga = $produk['harga'];
+                }
 
+                $varian = ($data['varian'] === '-') ? ['', ''] : explode(',', $produk['variasi']);
                 ProdukUserVariasi::create([
                     'produk_id' => $data['produk_id'],
                     'user_id_market' => $data['user_id'],
@@ -255,7 +269,8 @@ class ProdukRepo
             }
 
             // SIMPAN GAMBAR PRODUK
-            $urut = 0; $preview ='';
+            $urut = 0;
+            $preview = '';
             $path = public_path('image/produk/bukan_toko');
             if (!File::exists($path)) File::makeDirectory($path, 0755, false, true);
 
@@ -273,8 +288,9 @@ class ProdukRepo
                 $urut++;
             }
 
-            $createData['img'] = $preview;
             ProdukUserMain::create($createData);
+
+            $this->InsertProdukMasterSearch($createData, $harga, $preview);
 
             DB::connection('mysql_market')->commit();
 
@@ -295,5 +311,23 @@ class ProdukRepo
     {
         $t = ProdukUserVariasi::where('user_id_market', $user_id)->count();
         return $t;
+    }
+
+    public function InsertProdukMasterSearch($produk, $hargaTerkecil, $img)
+    {
+        // FORMAT FILTER [ KATEGORI KONDISI ] SEMENTARA HANYA ITU
+        $filter = "";
+        $kategori = "kat$produk[kategori]"; // kategori
+        $filter .= "$kategori ";
+        $data = [
+            'produk_id' => $produk['produk_id'],
+            'name'  => $produk['name'],
+            'img' => $img,
+            'harga' => $hargaTerkecil,
+            'diskon_harga' => 0,
+            'key_filter' => $filter,
+
+        ];
+        ProdukMaster::create($data);
     }
 }
