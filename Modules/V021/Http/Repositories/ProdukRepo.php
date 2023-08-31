@@ -323,6 +323,7 @@ class ProdukRepo
             'produk_id' => $produk['produk_id'],
             'name'  => $produk['name'],
             'img' => $img,
+            'deskripsi' => $produk['deskripsi'],
             'harga' => $hargaTerkecil,
             'diskon_harga' => 0,
             'key_filter' => $filter,
