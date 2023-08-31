@@ -14,7 +14,8 @@ return new class extends Migration
     {
         Schema::create('produk_masters', function (Blueprint $table) {
             $table->string('produk_id', 32)->primary();
-            $table->string('name')->fulltext('name');
+            $table->string('name',100)->fulltext('name');
+            $table->string('deskripsi',600)->fulltext('deskripsi');
             $table->float('rating', 3, 1)->default(0);
             $table->string('img', 50);
             $table->integer('harga');
@@ -23,7 +24,7 @@ return new class extends Migration
             $table->string('key_filter')->fulltext('key');
             $table->timestamps();
 
-
+// FILTER BELUM SAMA DESKRIPSI
             $table->index(['name','key_filter','terjual']);
             $table->index(['name','key_filter','harga']);
             $table->index(['name','key_filter','created_at']);

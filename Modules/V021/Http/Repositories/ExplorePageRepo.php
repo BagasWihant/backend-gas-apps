@@ -36,7 +36,7 @@ class ExplorePageRepo
                 elseif ($sort == 'lrs') $query->orderBy('terjual', 'desc');
             }
 
-            $results = $query->paginate(2);
+            $results = $query->paginate(25);
             $res['data'] = $results->items();
             $res['maxPage'] = $results->lastPage();
             $res['currentPage'] = $results->currentPage();
@@ -44,5 +44,9 @@ class ExplorePageRepo
         } catch (\Throwable $th) {
             return [false, 'Ada kesalahan server'];
         }
+    }
+
+    public function detail($id){
+
     }
 }
