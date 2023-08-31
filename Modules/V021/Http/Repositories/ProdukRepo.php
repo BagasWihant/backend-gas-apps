@@ -89,7 +89,7 @@ class ProdukRepo
             ];
             ProdukFashionMain::create($mainData);
 
-            $this->InsertProdukMasterSearch($mainData, $harga, $preview);
+            $this->InsertProdukMasterSearch($mainData, $harga, $preview,1);
 
             DB::connection('mysql_market')->commit();
 
@@ -108,37 +108,37 @@ class ProdukRepo
             DB::connection('mysql_market')->beginTransaction();
 
             $kategoriClasses = [
-                1 => [
+                6 => [
                     'main' => ProdukKebutuhanPokokMain::class,
                     'variasi' => ProdukKebutuhanPokokVariasi::class,
                     'image' => ProdukKebutuhanPokokImage::class,
                     'folder' => 'kebutuhan_pokok',
                 ],
-                2 => [
+                7 => [
                     'main' => ProdukBuahSayurMain::class,
                     'variasi' => ProdukBuahSayurVariasi::class,
                     'image' => ProdukBuahSayurImage::class,
                     'folder' => 'buah_sayur',
                 ],
-                3 => [
+                8 => [
                     'main' => ProdukMakanMinumMain::class,
                     'variasi' => ProdukMakanMinumVariasi::class,
                     'image' => ProdukMakanMinumImage::class,
                     'folder' => 'makan_minum',
                 ],
-                4 => [
+                9 => [
                     'main' => ProdukBumbuMain::class,
                     'variasi' => ProdukBumbuVariasi::class,
                     'image' => ProdukBumbuImage::class,
                     'folder' => 'bumbu',
                 ],
-                5 => [
+                10 => [
                     'main' => ProdukMandiMain::class,
                     'variasi' => ProdukMandiVariasi::class,
                     'image' => ProdukMandiImage::class,
                     'folder' => 'mandi',
                 ],
-                6 => [
+                11 => [
                     'main' => ProdukKosmetikMain::class,
                     'variasi' => ProdukKosmetikVariasi::class,
                     'image' => ProdukKosmetikImage::class,
@@ -206,7 +206,7 @@ class ProdukRepo
                     'berat' => $data['berat'][0] . '.' . $data['berat'][1],
                 ];
                 $mainClass::create($mainData);
-                $this->InsertProdukMasterSearch($mainData, $harga, $preview);
+                $this->InsertProdukMasterSearch($mainData, $harga, $preview,$data['kategori']);
             } else {
                 return [false, 'Kategori ini tidak ada'];
             }
@@ -290,7 +290,7 @@ class ProdukRepo
 
             ProdukUserMain::create($createData);
 
-            $this->InsertProdukMasterSearch($createData, $harga, $preview);
+            $this->InsertProdukMasterSearch($createData, $harga, $preview,99);
 
             DB::connection('mysql_market')->commit();
 
@@ -313,7 +313,7 @@ class ProdukRepo
         return $t;
     }
 
-    public function InsertProdukMasterSearch($produk, $hargaTerkecil, $img)
+    public function InsertProdukMasterSearch($produk, $hargaTerkecil, $img,$tableID)
     {
         // FORMAT FILTER [ KATEGORI KONDISI ] SEMENTARA HANYA ITU
         $filter = "";
@@ -327,7 +327,7 @@ class ProdukRepo
             'harga' => $hargaTerkecil,
             'diskon_harga' => 0,
             'key_filter' => $filter,
-
+            'table' => $tableID
         ];
         ProdukMaster::create($data);
     }
