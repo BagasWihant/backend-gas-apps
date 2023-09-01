@@ -38,4 +38,10 @@ class ExploreController extends Controller
         return $res;
     }
 
+    public function detailProduk($id){
+        $res = $this->explore->detail($id);
+
+        return new Respons($res[0],'',$res[1]);
+    }
+
 }
