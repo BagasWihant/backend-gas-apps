@@ -18,8 +18,7 @@ class GantiAkunController extends Controller
     public function userToStore(Request $req)
     {
         $res = $this->gantiAkunRepo->userToStore($req->user());
-        if(!$res)  return new Respons(false,'Gagal berganti akun');
-        return new Respons(true,'Sukses berganti akun');
+        return new Respons(true,$res[1]);
     }
 
     public function storeToUser(Request $req)

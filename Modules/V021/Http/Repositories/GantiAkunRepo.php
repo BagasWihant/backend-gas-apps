@@ -12,12 +12,12 @@ class GantiAkunRepo
     {
         try {
             $market = Store::where('user_id_market',$user->idMarket->user_id_market)->first();
-            if(!$market) return false;
+            if(!$market) return [false,'Belum Memiliki akun Toko'];
 
             User::find($user->id)->update(['as_store' => 1]);
-            return true;
+            return [true,'Berhasil berganti ke akun Toko'];
         } catch (\Throwable $th) {
-            return false;
+            return [false,'Gagal Ada kesalahan sistem'];
         }
     }
 
