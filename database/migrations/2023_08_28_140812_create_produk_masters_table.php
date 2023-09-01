@@ -22,7 +22,8 @@ return new class extends Migration
             $table->integer('diskon_harga')->nullable();
             $table->integer('terjual')->nullable();
             $table->string('key_filter')->fulltext('key');
-            $table->char('table',2)->comment('99=user | 1=fashion | lainnya produk harian');
+            $table->char('table',2)->comment('1=fashion | lainnya produk harian');
+            $table->char('is_user',2)->nullable()->comment('99=user | null=toko');
             $table->timestamps();
 
             // FILTER BELUM SAMA DESKRIPSI
