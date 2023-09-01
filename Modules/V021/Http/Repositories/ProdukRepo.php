@@ -88,8 +88,8 @@ class ProdukRepo
                 'berat' => $data['berat'][0] . '.' . $data['berat'][1],
             ];
             ProdukFashionMain::create($mainData);
-
-            $this->InsertProdukMasterSearch($mainData, $harga, $preview,1);
+            $insertMaster = [$mainData, $harga, $preview, 1];
+            $this->InsertProdukMasterSearch($insertMaster);
 
             DB::connection('mysql_market')->commit();
 
@@ -206,7 +206,8 @@ class ProdukRepo
                     'berat' => $data['berat'][0] . '.' . $data['berat'][1],
                 ];
                 $mainClass::create($mainData);
-                $this->InsertProdukMasterSearch($mainData, $harga, $preview,$data['kategori']);
+                $insertMaster = [$mainData, $harga, $preview, $data['kategori']];
+                $this->InsertProdukMasterSearch($insertMaster);
             } else {
                 return [false, 'Kategori ini tidak ada'];
             }
@@ -239,8 +240,21 @@ class ProdukRepo
             if ($data['jenis_produk'] == 1) {
                 $createData['gender'] = $data['gender'];
                 $createData['kondisi'] = $data['kondisi'];
+                // MAPPING KATEGORI
+                $kt = [1, 2, 3, 4, 5];
+                if (in_array($data['kategori'], $kt)) {
+                    $kategori = 1;
+                } else {
+                    throw new \Exception("Kategori ini Tidak ada");
+                }
             } elseif ($data['jenis_produk'] == 2) {
                 $createData['expired'] = $data['expired'];
+                $kt = [6, 7, 8, 9, 10, 11];
+                if (in_array($data['kategori'], $kt)) {
+                    $kategori = $data['kategori'];
+                } else {
+                    throw new \Exception("Kategori ini Tidak ada");
+                }
             }
 
 
@@ -290,7 +304,9 @@ class ProdukRepo
 
             ProdukUserMain::create($createData);
 
-            $this->InsertProdukMasterSearch($createData, $harga, $preview,99);
+
+            $insertMaster = [$createData, $harga, $preview, $kategori];
+            $this->InsertProdukMasterSearch($insertMaster,99);
 
             DB::connection('mysql_market')->commit();
 
@@ -313,21 +329,23 @@ class ProdukRepo
         return $t;
     }
 
-    public function InsertProdukMasterSearch($produk, $hargaTerkecil, $img,$tableID)
+    public function InsertProdukMasterSearch($data,$user = null)
     {
         // FORMAT FILTER [ KATEGORI KONDISI ] SEMENTARA HANYA ITU
         $filter = "";
-        $kategori = "kat$produk[kategori]"; // kategori
-        $filter .= "$kategori ";
+
+        $kategori = $data[0]['kategori']; // kategori
+        $filter .= "kat" . $kategori . " ";
         $data = [
-            'produk_id' => $produk['produk_id'],
-            'name'  => $produk['name'],
-            'img' => $img,
-            'deskripsi' => $produk['deskripsi'],
-            'harga' => $hargaTerkecil,
+            'produk_id' => $data[0]['produk_id'],
+            'name'  => $data[0]['name'],
+            'deskripsi' => $data[0]['deskripsi'],
             'diskon_harga' => 0,
             'key_filter' => $filter,
-            'table' => $tableID
+            'harga' => $data[1],
+            'img' => $data[2],
+            'table' => $data[3],
+            'is_user' => $user
         ];
         ProdukMaster::create($data);
     }
