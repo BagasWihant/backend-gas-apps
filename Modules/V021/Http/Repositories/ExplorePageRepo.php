@@ -72,6 +72,7 @@ class ExplorePageRepo
                     $data['image'] = $image;
                     $data['variasi'] = $variasi;
                     $data['produk'] = $produk;
+                    $data['is_user'] = '1';
                     $res = [true, $data];
                     break;
 
@@ -82,6 +83,8 @@ class ExplorePageRepo
                     $data['image'] = $image;
                     $data['variasi'] = $variasi;
                     $data['produk'] = $produk;
+                    $data['is_user'] = '0';
+
                     $res = [true, $data];
 
                     break;
@@ -93,6 +96,8 @@ class ExplorePageRepo
                     $data['image'] = $image;
                     $data['variasi'] = $variasi;
                     $data['produk'] = $produk;
+                    $data['is_user'] = '0';
+
                     $res = [true, $data];
 
                     break;
@@ -104,6 +109,8 @@ class ExplorePageRepo
                     $data['image'] = $image;
                     $data['variasi'] = $variasi;
                     $data['produk'] = $produk;
+                    $data['is_user'] = '0';
+
                     $res = [true, $data];
 
                     break;
@@ -115,6 +122,8 @@ class ExplorePageRepo
                     $data['image'] = $image;
                     $data['variasi'] = $variasi;
                     $data['produk'] = $produk;
+                    $data['is_user'] = '0';
+
                     $res = [true, $data];
                     break;
 
@@ -125,6 +134,8 @@ class ExplorePageRepo
                     $data['image'] = $image;
                     $data['variasi'] = $variasi;
                     $data['produk'] = $produk;
+                    $data['is_user'] = '0';
+
                     $res = [true, $data];
                     break;
 
@@ -135,6 +146,8 @@ class ExplorePageRepo
                     $data['image'] = $image;
                     $data['variasi'] = $variasi;
                     $data['produk'] = $produk;
+                    $data['is_user'] = '0';
+
                     $res = [true, $data];
                     break;
 
@@ -145,6 +158,8 @@ class ExplorePageRepo
                     $data['image'] = $image;
                     $data['variasi'] = $variasi;
                     $data['produk'] = $produk;
+                    $data['is_user'] = '0';
+
                     $res = [true, $data];
                     break;
 
@@ -156,6 +171,6 @@ class ExplorePageRepo
             return [false, 'Produk Tidak Ditemukan'];
         }
 
-        return [true,$res];
+        return $res;
     }
 }
