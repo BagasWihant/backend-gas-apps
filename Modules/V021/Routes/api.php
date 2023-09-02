@@ -46,7 +46,10 @@ Route::prefix('v021')->group(function () {
 
     // EXPLORE cari barang
     Route::prefix('explore')->group(function (){
-        Route::get('/find/{key}', [ExploreController::class, 'temukanProduk']);
+        Route::controller(ExploreController::class)->group(function(){
+            Route::get('/find/{key}', 'temukanProduk');
+            Route::get('/detail/{id}', 'detailProduk');
+        });
     });
 
     // HARUS LOGIN DULU
