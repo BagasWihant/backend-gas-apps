@@ -22,12 +22,14 @@ class LoginController extends Controller
             'email'  => 'required|email',
             'password' => 'required|min:6'
         ]);
-        if ($validator->fails()) return new Respons(false, 'Validation Failed', $validator->errors());
+        if ($validator->fails()) return response()->json(['message'=>'Validasi Gagal',$validator->errors()],400);
+
 
 
 
         if (!Auth::attempt($req->only(['email','password']))) {
-            return new Respons(false, 'Email / password salah', ['fail'=>true]);
+            return response()->json(['message'=>'Email / Password Salah'],400);
+
         }
 
         $user = User::where('email', $req->email)->first();
@@ -39,7 +41,8 @@ class LoginController extends Controller
             'market' =>$userMarket->user_id_market,
             'token' =>$token,
         ]);
-        return new Respons(true, 'Success Login', $res);
+        // return new Respons(true, 'Success Login', $res);
+        return response()->json(['message'=>'Berhasil Login','data'=>$res]);
     }
 
     public function resetPasswordSendOtp(Request $req){
@@ -48,7 +51,8 @@ class LoginController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return new Respons(false, 'Validation Failed', $validator->errors());
+            // return new Respons(false, 'Validation Failed', $validator->errors());
+            return response()->json(['message'=>'Validasi Gagal',$validator->errors()],400);
         }
 
         // GET OTP
@@ -64,18 +68,19 @@ class LoginController extends Controller
             'title' => 'RESET PASSWORD'
         ];
         // Mail::to($req->email)->send(new Register($mailData));
-        return new Respons(true, 'Code Sent Succesfully', $mailData);
+        // return new Respons(true, 'Code Sent Succesfully', $mailData);
+        return response()->json(['message'=>'Kode Berhasail Dikirim','data'=>$mailData]);
     }
 
     public function resetPasswordConfirmOtp(Request $req){
         $otp = Otpcode::where(['key' => $req->key, 'otp' => $req->otp, 'status' => 0])->first();
-        if (!$otp) return new Respons(false, 'OTP Does Not Match');
+        if (!$otp) return response()->json(['message'=>'Otp Tidak Sama'],401);
 
-        if (Carbon::now() > $otp->valid) return new Respons(false, 'OTP Timeout');
+        if (Carbon::now() > $otp->valid) return response()->json(['message'=>'Waktu Habis'],408);
 
         $otp->status = 1;
         $otp->save();
-        return new Respons(true, 'OTP Confirmed');
+        return response()->json(['message'=>'Kode Berhasail Dikirim']);
     }
 
     public function resetPassword(Request $req){
@@ -85,13 +90,13 @@ class LoginController extends Controller
             'c_password' => 'required|same:password',
             'email' => 'required',
         ]);
-        if ($validator->fails()) return new Respons(false, 'Validation Failed', $validator->errors());
+        if ($validator->fails()) return response()->json(['message'=>'Validasi Gagal',$validator->errors()],400);
 
         $user = User::where('email',$req->email)->first();
-        if(!$user) return new Respons(false, 'Email tidak ditemukan');
+        if(!$user) return response()->json(['message'=>'Email Tidak Ditemukan'],400);
 
         $otp = Otpcode::where(['key' => $req->email, 'status'=>1])->first();
-        if(!$otp) return new Respons(false, 'OTP Does Not Match');
+        if(!$otp) return response()->json(['message'=>'OTP Tidak sama'],400);
 
         $newPassword = bcrypt($req->password);
         try {
@@ -101,10 +106,12 @@ class LoginController extends Controller
             $user->save();
             $otp->delete();
             DB::commit();
-            return new Respons(true, 'Password reset successfully');
+
+            return response()->json(['message'=>'Password Berhasil direset']);
         } catch (\Throwable $th) {
             DB::rollBack();
-            return new Respons(false, $th->errorInfo[2], $th);
+            // return new Respons(false, $th->errorInfo[2], $th);
+            return response()->json(['message'=>'Kesalahan Sistem'],400);
         }
 
     }
