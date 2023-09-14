@@ -15,13 +15,15 @@ return new class extends Migration
     {
         Schema::create('keranjangs', function (Blueprint $table) {
             $table->id();
-            $table->string('user_id',12);
+            $table->string('user_id',12)->index();
             $table->string('seller_id',12);
-            $table->char('is_user',1)->comment('1=produk oleh user')->nullable();
+            $table->char('is_user',1)->comment('1=produk tabel user | 0=produk toko')->nullable();
             $table->string('produk_id',32);
             $table->char('table_id',1)->comment('posisi produk tabel');
-            $table->bigInteger('variasi_id');
-            $table->integer('harga_diskon');
+            // $table->string('var_1',30)->nullable();
+            // $table->string('var_2',30)->nullable();
+            $table->bigInteger('var_id')->nullable();
+            $table->integer('harga_diskon')->nullable()->comment('hanya tampilan');
             $table->integer('harga');
             $table->string('catatan')->nullable();
             $table->integer('qty')->default(1);

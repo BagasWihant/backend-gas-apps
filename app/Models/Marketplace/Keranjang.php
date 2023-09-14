@@ -2,8 +2,10 @@
 
 namespace App\Models\Marketplace;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Marketplace\UserMarket;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Keranjang extends Model
 {
@@ -11,4 +13,10 @@ class Keranjang extends Model
     protected $connection = 'mysql_market';
     protected $guarded = ['id'];
     public $timestamps = false;
+
+    public function seller(): HasOne
+    {
+        return $this->hasOne(UserMarket::class,'user_id_market','seller_id');
+    }
+
 }

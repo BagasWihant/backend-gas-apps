@@ -10,6 +10,7 @@ use Modules\V021\Http\Controllers\User\ProfileController;
 use Modules\V021\Http\Controllers\Auth\RegisterController;
 use Modules\V021\Http\Controllers\Produk\ProdukController;
 use Modules\V021\Http\Controllers\Explore\ExploreController;
+use Modules\V021\Http\Controllers\Marketplace\KeranjangController;
 use Modules\V021\Http\Controllers\Utility\GantiAkunController;
 
 /*
@@ -64,9 +65,10 @@ Route::prefix('v021')->group(function () {
             Route::post('/profile-foto', 'changeFoto');
         });
 
-        // ADDRESS
+        // ADDRESS || KERANJANG
         Route::resources([
             'profile-address' => AddressController::class,
+            'keranjang' => KeranjangController::class,
         ]);
 
         // REGISTER STORE

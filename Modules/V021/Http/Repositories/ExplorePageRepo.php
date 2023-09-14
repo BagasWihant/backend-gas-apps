@@ -68,99 +68,91 @@ class ExplorePageRepo
                 case 99:
                     $produk = ProdukUserMain::where('produk_id', $id)->select()->first();
                     $image = $produk->images()->select('img')->get();
-                    $variasi = $produk->variasi()->select(['var_1', 'var_2', 'harga', 'stok'])->get();
+                    $variasi = $produk->variasi()->select(['var_1', 'var_2', 'harga', 'stok','id AS kode'])->get();
                     $data['image'] = $image;
                     $data['variasi'] = $variasi;
                     $data['produk'] = $produk;
                     $data['is_user'] = '1';
-                    $res = [true, $data];
                     break;
 
                 case 1:
                     $produk = ProdukFashionMain::where('produk_id', $id)->first();
                     $image = $produk->images()->select('img')->get();
-                    $variasi = $produk->variasi()->select(['var_1', 'var_2', 'harga', 'stok'])->get();
+                    $variasi = $produk->variasi()->select(['var_1', 'var_2', 'harga', 'stok','id AS kode'])->get();
                     $data['image'] = $image;
                     $data['variasi'] = $variasi;
                     $data['produk'] = $produk;
                     $data['is_user'] = '0';
 
-                    $res = [true, $data];
 
                     break;
 
                 case 6:
                     $produk = ProdukKebutuhanPokokMain::where('produk_id', $id)->first();
                     $image = $produk->images()->select('img')->get();
-                    $variasi = $produk->variasi()->select(['var_1', 'var_2', 'harga', 'stok'])->get();
+                    $variasi = $produk->variasi()->select(['var_1', 'var_2', 'harga', 'stok','id AS kode'])->get();
                     $data['image'] = $image;
                     $data['variasi'] = $variasi;
                     $data['produk'] = $produk;
                     $data['is_user'] = '0';
 
-                    $res = [true, $data];
 
                     break;
 
                 case 7:
                     $produk = ProdukBuahSayurMain::where('produk_id', $id)->first();
                     $image = $produk->images()->select('img')->get();
-                    $variasi = $produk->variasi()->select(['var_1', 'var_2', 'harga', 'stok'])->get();
+                    $variasi = $produk->variasi()->select(['var_1', 'var_2', 'harga', 'stok','id AS kode'])->get();
                     $data['image'] = $image;
                     $data['variasi'] = $variasi;
                     $data['produk'] = $produk;
                     $data['is_user'] = '0';
 
-                    $res = [true, $data];
 
                     break;
 
                 case 8:
                     $produk = ProdukMakanMinumMain::where('produk_id', $id)->first();
                     $image = $produk->images()->select('img')->get();
-                    $variasi = $produk->variasi()->select(['var_1', 'var_2', 'harga', 'stok'])->get();
+                    $variasi = $produk->variasi()->select(['var_1', 'var_2', 'harga', 'stok','id AS kode'])->get();
                     $data['image'] = $image;
                     $data['variasi'] = $variasi;
                     $data['produk'] = $produk;
                     $data['is_user'] = '0';
 
-                    $res = [true, $data];
                     break;
 
                 case 9:
                     $produk = ProdukBumbuMain::where('produk_id', $id)->first();
                     $image = $produk->images()->select('img')->get();
-                    $variasi = $produk->variasi()->select(['var_1', 'var_2', 'harga', 'stok'])->get();
+                    $variasi = $produk->variasi()->select(['var_1', 'var_2', 'harga', 'stok','id AS kode'])->get();
                     $data['image'] = $image;
                     $data['variasi'] = $variasi;
                     $data['produk'] = $produk;
                     $data['is_user'] = '0';
 
-                    $res = [true, $data];
                     break;
 
                 case 10:
                     $produk = ProdukMandiMain::where('produk_id', $id)->first();
                     $image = $produk->images()->select('img')->get();
-                    $variasi = $produk->variasi()->select(['var_1', 'var_2', 'harga', 'stok'])->get();
+                    $variasi = $produk->variasi()->select(['var_1', 'var_2', 'harga', 'stok','id AS kode'])->get();
                     $data['image'] = $image;
                     $data['variasi'] = $variasi;
                     $data['produk'] = $produk;
                     $data['is_user'] = '0';
 
-                    $res = [true, $data];
                     break;
 
                 case 11:
                     $produk = ProdukKosmetikMain::where('produk_id', $id)->first();
                     $image = $produk->images()->select('img')->get();
-                    $variasi = $produk->variasi()->select(['var_1', 'var_2', 'harga', 'stok'])->get();
+                    $variasi = $produk->variasi()->select(['var_1', 'var_2', 'harga', 'stok','id AS kode'])->get();
                     $data['image'] = $image;
                     $data['variasi'] = $variasi;
                     $data['produk'] = $produk;
                     $data['is_user'] = '0';
 
-                    $res = [true, $data];
                     break;
 
                 default:
@@ -171,6 +163,6 @@ class ExplorePageRepo
             return [false, 'Produk Tidak Ditemukan'];
         }
 
-        return $res;
+        return $data;
     }
 }
