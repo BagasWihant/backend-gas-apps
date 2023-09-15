@@ -32,6 +32,7 @@ Route::prefix('v021')->group(function () {
         Route::post('/registerSendOtp', 'registerSendOtp');
         Route::post('/registerConfirmOtp', 'registerConfirmOtp');
         Route::post('/register', 'register');
+        Route::post('/registerGoogle', 'registerGoogle');
     });
 
 

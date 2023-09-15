@@ -104,7 +104,9 @@ class RegisterController extends Controller
             'phone' => 'required|numeric',
         ]);
         if ($validator->fails()) return new Respons(false, 'Validation Failed', $validator->errors());
+        $only['time'] = $this->strleft;
 
+        return $this->repo->registerWithGoogle($only);
 
     }
 
