@@ -49,80 +49,54 @@ class KeranjangRepo
     public function listProduk($id)
     {
 
-
         $item = Keranjang::select(['seller_id', 'produk_id', 'table_id', 'var_id', 'harga', 'qty', 'is_user'])->where('user_id', $id)->get();
-        $store_products = array();
+        $storeProducts = [];
 
         foreach ($item as $item) {
+
             $idSeller = $item->seller()->first();
 
             if ($item->is_user == 1) {
                 $store = User::select(['name', 'photo'])->find($idSeller->user_id_main);
 
-                if (!isset($store_products[$store->name])) {
-                    $store_products[$store->name] = array();
-                }
+                $modelName = ProdukUserMain::class;
 
-                $produk = ProdukUserMain::where('produk_id', $item->produk_id)->select(['produk_id', 'name'])->first();
-                $img = $produk->images()->select('img')->first();
-                $variasi = $produk->variasi()->select(['var_1', 'var_2', 'stok', 'harga'])->find($item->var_id);
             } else {
                 $store = $idSeller->store()->select(['store_name as name', 'foto_profil as photo'])->first();
-
-                if (!isset($store_products[$store->name])) {
-                    $store_products[$store->name] = array();
-                }
-
 
                 $tableID = $item->table_id;
 
                 switch ($tableID) {
-
                     case 6:
-                        $produk = ProdukKebutuhanPokokMain::where('produk_id', $item->produk_id)->select(['produk_id', 'name'])->first();
-                        $img = $produk->images()->select('img')->first();
-                        $variasi = $produk->variasi()->select(['var_1', 'var_2', 'stok', 'harga'])->find($item->var_id);
+                        $modelName = ProdukKebutuhanPokokMain::class;
                         break;
-
                     case 7:
-                        $produk = ProdukBuahSayurMain::where('produk_id', $item->produk_id)->select(['produk_id', 'name'])->first();
-                        $img = $produk->images()->select('img')->first();
-                        $variasi = $produk->variasi()->select(['var_1', 'var_2', 'stok', 'harga'])->find($item->var_id);
-
-
+                        $modelName = ProdukBuahSayurMain::class;
                         break;
-
                     case 8:
-                        $produk = ProdukMakanMinumMain::where('produk_id', $item->produk_id)->select(['produk_id', 'name'])->first();
-                        $img = $produk->images()->select('img')->first();
-                        $variasi = $produk->variasi()->select(['var_1', 'var_2', 'stok', 'harga'])->find($item->var_id);
-
+                        $modelName = ProdukMakanMinumMain::class;
                         break;
-
                     case 9:
-                        $produk = ProdukBumbuMain::where('produk_id', $item->produk_id)->select(['produk_id', 'name'])->first();
-                        $img = $produk->images()->select('img')->first();
-                        $variasi = $produk->variasi()->select(['var_1', 'var_2', 'stok', 'harga'])->find($item->var_id);
-
+                        $modelName = ProdukBumbuMain::class;
                         break;
-
                     case 10:
-                        $produk = ProdukMandiMain::where('produk_id', $item->produk_id)->select(['produk_id', 'name'])->first();
-                        $img = $produk->images()->select('img')->first();
-                        $variasi = $produk->variasi()->select(['var_1', 'var_2', 'stok', 'harga'])->find($item->var_id);
+                        $modelName = ProdukMandiMain::class;
                         break;
-
                     case 11:
-                        $produk = ProdukKosmetikMain::where('produk_id', $item->produk_id)->select(['produk_id', 'name'])->first();
-                        $img = $produk->images()->select('img')->first();
-                        $variasi = $produk->variasi()->select(['var_1', 'var_2', 'stok', 'harga'])->find($item->var_id);
+                        $modelName = ProdukKosmetikMain::class;
                         break;
-
                     default:
                         return response()->json(['message' => 'Kategori produk yang dipilih tidak ada']);
-                        break;
                 }
             }
+
+            if (!isset($storeProducts[$store->name])) {
+                $storeProducts[$store->name] = ['name' => $store->name, 'photo' => $store->photo, 'data' => []];
+            }
+
+            $produk = $modelName::where('produk_id', $item->produk_id)->select(['produk_id', 'name'])->first();
+            $img = $produk->images()->select('img')->first();
+            $variasi = $produk->variasi()->select(['var_1', 'var_2', 'stok', 'harga'])->find($item->var_id);
 
             $itemData = [
                 'var_1' => $variasi ? $variasi->var_1 : null,
@@ -132,18 +106,10 @@ class KeranjangRepo
                 'img' => $img ? $img->img : null,
             ];
 
-            $store_products[$store->name]['data'][] = $itemData;
-            $store_products[$store->name]['name'] = $store->name;
-            $store_products[$store->name]['photo'] = $store->photo;
+            $storeProducts[$store->name]['data'][] = $itemData;
         }
 
-        $data = [];
-        foreach ($store_products as $key => $value) {
-            $data[] = $value;
-        }
+        $data = array_values($storeProducts);
         return response()->json($data);
-        // return response()->json($collection);
-
-
     }
 }
