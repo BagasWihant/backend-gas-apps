@@ -14,14 +14,16 @@ use App\Models\Marketplace\UserMarket;
 use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Contracts\Support\Renderable;
+use Modules\V021\Http\Repositories\ResgiterUserRepo;
 
 class RegisterController extends Controller
 {
-    protected $strleft;
+    protected $strleft,$repo;
 
-    public function __construct()
+    public function __construct(ResgiterUserRepo $repo)
     {
         $this->strleft = substr(Carbon::now()->timestamp, 3);
+        $this->repo = $repo;
     }
 
     public function registerSendOtp(Request $req)
@@ -76,10 +78,11 @@ class RegisterController extends Controller
         $validator = Validator::make($only, [
             'name' => 'required',
             'email' => 'required|email:filter,spoof,dns|unique:users,email',
-            'password' => 'required',
+            'password' => 'required|min:6',
             'phone' => 'required|numeric',
         ]);
-        if ($validator->fails()) return new Respons(false, 'Validation Failed', $validator->errors());
+        // if ($validator->fails()) return new Respons(false, 'Validation Failed', $validator->errors());
+        if ($validator->fails()) return response()->badRequest('Validarion Failed',$validator->errors());
 
 
         // $otp = Otpcode::where(['key' => $req->email, 'status'=>1])->first();
@@ -88,34 +91,21 @@ class RegisterController extends Controller
 
         $input  = $only;
         $input['password'] = bcrypt($input['password']);
-        try {
-            // input ke db
-            DB::beginTransaction();
-            $userMain = User::create($input);
-            $userMarketId = str_pad($userMain->id, 11, $this->strleft, STR_PAD_RIGHT); //BUAT RANDOM USER ID
-            UserMarket::create([
-                'user_id_main' => $userMain->id,
-                'user_id_market' => $userMarketId,
-            ]);
-            // $otp->delete();
-
-            DB::commit();
-            $res = collect([
-                'number' => $userMain->id,
-                'market' => $userMarketId,
-                'token' => $userMain->createToken($userMain->name)->plainTextToken,
-                'name' => $userMain->name,
-            ]);
-            return new Respons(true, 'Berhasil mendaftar', $res);
-        } catch (\Throwable $th) {
-            DB::rollBack();
-            return new Respons(false, $th->errorInfo[2], $th);
-        }
+        $input['time'] = $this->strleft;
+        return $this->repo->register($input);
     }
 
-    public function registerGoogle()
+    public function registerGoogle(Request $req)
     {
-        return Socialite::driver('google')->stateless()->redirect();
+        $only = $req->only('name', 'email', 'phone');
+        $validator = Validator::make($only, [
+            'name' => 'required',
+            'email' => 'required|email:filter,spoof,dns|unique:users,email',
+            'phone' => 'required|numeric',
+        ]);
+        if ($validator->fails()) return new Respons(false, 'Validation Failed', $validator->errors());
+
+
     }
 
 
