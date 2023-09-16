@@ -35,7 +35,7 @@ class ResgiterUserRepo
                 'token' => $userMain->createToken($userMain->name)->plainTextToken,
                 'name' => $userMain->name,
             ]);
-            $response =  response()->created($res);
+            $response =  response()->created('Berhasil Daftar',$res);
             // return response()->json(['message'=>"Berhasil Mendaftar",$res]);
         } catch (\Throwable $th) {
             DB::rollBack();
@@ -74,7 +74,7 @@ class ResgiterUserRepo
                 'token' => $userMain->createToken('token-name')->plainTextToken,
             ];
 
-            $response= response()->created($res);
+            $response= response()->created('Berhasil Masuk Dengan Google',$res);
             DB::commit();
             DB::connection('mysql_market')->commit();
 
