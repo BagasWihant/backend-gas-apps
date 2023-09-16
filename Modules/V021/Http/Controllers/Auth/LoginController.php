@@ -22,14 +22,13 @@ class LoginController extends Controller
             'email'  => 'required|email',
             'password' => 'required|min:6'
         ]);
-        if ($validator->fails()) return response()->json(['message'=>'Validasi Gagal',$validator->errors()],400);
+        if ($validator->fails()) return response()->json(['message'=>'Validasi Gagal','data'=>$validator->errors()],400);
 
 
 
 
         if (!Auth::attempt($req->only(['email','password']))) {
             return response()->json(['message'=>'Email / Password Salah'],400);
-
         }
 
         $user = User::where('email', $req->email)->first();

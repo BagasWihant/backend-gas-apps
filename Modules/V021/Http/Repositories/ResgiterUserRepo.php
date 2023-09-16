@@ -12,10 +12,12 @@ class ResgiterUserRepo
 {
     public function register($input)
     {
-
+        $response = [];
         try {
             // input ke db
             DB::beginTransaction();
+            DB::connection('mysql_market')->beginTransaction();
+
             $userMain = User::create($input);
             $userMarketId = str_pad($userMain->id, 11, $input['time'], STR_PAD_RIGHT); //BUAT RANDOM USER ID
             UserMarket::create([
@@ -25,25 +27,31 @@ class ResgiterUserRepo
             // $otp->delete();
 
             DB::commit();
+            DB::connection('mysql_market')->commit();
+
             $res = collect([
                 'number' => $userMain->id,
                 'market' => $userMarketId,
                 'token' => $userMain->createToken($userMain->name)->plainTextToken,
                 'name' => $userMain->name,
             ]);
-            return response()->created($res);
+            $response =  response()->created($res);
             // return response()->json(['message'=>"Berhasil Mendaftar",$res]);
         } catch (\Throwable $th) {
             DB::rollBack();
-            return response()->json(['message' => "Terjadi Kesalahan", $th], 500);
-            // return new Respons(false, $th->errorInfo[2], $th);
+            DB::connection('mysql_market')->rollBack();
+
+            $response = response()->internalServerError($th->getMessage());
+            if(!env('APP_DEBUG'))$response = response()->internalServerError();
         }
+        return $response;
     }
     public function registerWithGoogle($input)
     {
-
+        $response = [];
         try {
             DB::beginTransaction();
+            DB::connection('mysql_market')->beginTransaction();
 
             $userMain = User::firstOrCreate([
                 'email' => $input['email'],
@@ -59,17 +67,25 @@ class ResgiterUserRepo
                 'user_id_market' => $userMarketId,
             ]);
 
-            DB::commit();
 
-            $res = new stdClass;
-            $res->name = $userMain->name;
-            $res->email = $userMain->email;
-            $res->token = $userMain->createToken('token-name')->plainTextToken;
-            // return response()->json($res, 200);
-            return new Respons(true, 'Register Succesfully', $res);
+            $res= [
+                'name' => $userMain->name,
+                'email' => $userMain->email,
+                'token' => $userMain->createToken('token-name')->plainTextToken,
+            ];
+            $resi = new stdClass;
+
+            $response= response()->created($resi);
+            DB::commit();
+            DB::connection('mysql_market')->commit();
+
         } catch (\Throwable $th) {
             DB::rollBack();
-            return new Respons(false, $th->errorInfo[2], $th);
+            DB::connection('mysql_market')->rollBack();
+
+            $response = response()->internalServerError($th->getMessage());
+            if(!env('APP_DEBUG'))$response = response()->internalServerError();
         }
+        return $response;
     }
 }

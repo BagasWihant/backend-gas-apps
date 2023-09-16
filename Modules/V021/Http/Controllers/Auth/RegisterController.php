@@ -97,11 +97,10 @@ class RegisterController extends Controller
 
     public function registerGoogle(Request $req)
     {
-        $only = $req->only('name', 'email', 'phone');
+        $only = $req->only('name', 'email', 'photo');
         $validator = Validator::make($only, [
             'name' => 'required',
             'email' => 'required|email:filter,spoof,dns|unique:users,email',
-            'phone' => 'required|numeric',
         ]);
         if ($validator->fails()) return new Respons(false, 'Validation Failed', $validator->errors());
         $only['time'] = $this->strleft;
