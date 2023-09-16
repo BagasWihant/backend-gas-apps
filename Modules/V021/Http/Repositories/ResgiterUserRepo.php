@@ -73,9 +73,8 @@ class ResgiterUserRepo
                 'email' => $userMain->email,
                 'token' => $userMain->createToken('token-name')->plainTextToken,
             ];
-            $resi = new stdClass;
 
-            $response= response()->created($resi);
+            $response= response()->created($res);
             DB::commit();
             DB::connection('mysql_market')->commit();
 
