@@ -27,13 +27,16 @@ class ResponseServiceProvider extends ServiceProvider
     protected function descriptiveResponseMethods()
     {
         $instance = $this;
-        Response::macro('ok', function ($data = []) {
-            return Response::json(['data' => $data], 200);
+        Response::macro('ok', function ($message='',$data = []) {
+            if (count($data)) {
+                return Response::json(['message'=>$message,'data' => $data], 200);
+            }
+            return Response::json(['message'=>$message], 200);
         });
 
-        Response::macro('created', function ($data = []) {
+        Response::macro('created', function ($message='',$data = []) {
             if (count($data)) {
-                return Response::json(['data' => $data], 201);
+                return Response::json(['message'=>$message,'data' => $data], 201);
             }
 
             return Response::json([], 201);

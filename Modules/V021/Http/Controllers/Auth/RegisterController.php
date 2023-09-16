@@ -18,7 +18,7 @@ use Modules\V021\Http\Repositories\ResgiterUserRepo;
 
 class RegisterController extends Controller
 {
-    protected $strleft,$repo;
+    protected $strleft, $repo;
 
     public function __construct(ResgiterUserRepo $repo)
     {
@@ -58,17 +58,25 @@ class RegisterController extends Controller
             'otp' => 'required',
         ]);
         if ($validator->fails()) {
-            return new Respons(false, 'Validation Failed', $validator->errors());
+            // return new Respons(false, 'Validation Failed', $validator->errors());
+            return response()->badRequest('Validation Failed',$validator->errors());
         }
 
-        $otp = Otpcode::where(['key' => $req->key, 'otp' => $req->otp, 'status' => 0])->first();
-        if (!$otp) return new Respons(false, 'OTP Does Not Match');
 
-        if (Carbon::now() > $otp->valid) return new Respons(false, 'OTP Timeout');
+
+        $otp = Otpcode::where(['key' => $req->key, 'otp' => $req->otp, 'status' => 0, 'tipe' => 'REGISTER'])->first();
+        // if (!$otp) return new Respons(false, 'OTP Does Not Match');
+
+        // if (Carbon::now() > $otp->valid) return new Respons(false, 'OTP Timeout');
+        if (!$otp) return response()->ok('OTP Tidak Sama');
+
+        if (Carbon::now() > $otp->valid) return response()->ok('Waktu OTP Habis');
 
         $otp->status = 1;
         $otp->save();
-        return new Respons(true, 'OTP Confirmed');
+        return response()->ok('OTP Terverifikasi');
+
+        // return new Respons(true, 'OTP Confirmed');
     }
 
     public function register(Request $req)
@@ -82,7 +90,7 @@ class RegisterController extends Controller
             'phone' => 'required|numeric',
         ]);
         // if ($validator->fails()) return new Respons(false, 'Validation Failed', $validator->errors());
-        if ($validator->fails()) return response()->badRequest('Validarion Failed',$validator->errors());
+        if ($validator->fails()) return response()->badRequest('Validarion Failed', $validator->errors());
 
 
         // $otp = Otpcode::where(['key' => $req->email, 'status'=>1])->first();
@@ -106,41 +114,5 @@ class RegisterController extends Controller
         $only['time'] = $this->strleft;
 
         return $this->repo->registerWithGoogle($only);
-
-    }
-
-
-    public function handleLoginGoogle()
-    {
-        try {
-            DB::beginTransaction();
-
-            $user = Socialite::driver('google')->stateless()->user();
-            $userMain = User::firstOrCreate([
-                'email' => $user->email,
-                'name' => $user->name,
-                'photo' => $user->avatar,
-                'password' => 0
-            ]);
-
-            $userMarketId = str_pad($userMain->id, 11, $this->strleft, STR_PAD_RIGHT); //BUAT RANDOM USER ID
-
-            UserMarket::create([
-                'user_id_main' => $userMain->id,
-                'user_id_market' => $userMarketId,
-            ]);
-
-            DB::commit();
-        } catch (\Throwable $th) {
-            DB::rollBack();
-            return new Respons(false, $th->errorInfo[2], $th);
-        }
-
-        $res = new stdClass;
-        $res->name = $userMain->name;
-        $res->email = $userMain->email;
-        $res->token = $userMain->createToken('token-name')->plainTextToken;
-        // return response()->json($res, 200);
-        return new Respons(true, 'Register Succesfully', $res);
     }
 }
