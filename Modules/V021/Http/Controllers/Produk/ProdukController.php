@@ -47,7 +47,8 @@ class ProdukController extends Controller
             'produk' => 'required',
             'img.*' => 'image|mimes:jpeg,png,jpg|max:2048|required',
         ]);
-        if ($validator->fails()) return new Respons(false, 'Validation Failed', $validator->errors());
+        // if ($validator->fails()) return new Respons(false, 'Validation Failed', $validator->errors());
+        if ($validator->fails()) return response()->badRequest('Validation Failed');
 
         $hextime = dechex($timestamp);
         $hexid = dechex($user->id);
@@ -67,9 +68,9 @@ class ProdukController extends Controller
         ];
 
         $validator = Validator::make($allowed, $validatorRules[$jenis]);
-        if ($validator->fails()) {
-            return new Respons(false, 'Validation Failed', $validator->errors());
-        }
+        // if ($validator->fails()) return new Respons(false, 'Validation Failed', $validator->errors());
+
+        if ($validator->fails()) return response()->badRequest('Validation Failed');
 
         if ($jenis == 'K') {
             $allowed['expired'] = date('Y-m-d', strtotime($allowed['expired']));
@@ -80,13 +81,15 @@ class ProdukController extends Controller
             $countInputProduk = count($allowed['produk']);
 
             if ($countInputProduk > 10) {
-                return new Respons(false, 'User maksimal hanya 10 varian per produk');
+                // return new Respons(false, 'User maksimal hanya 10 varian per produk');
+                return response()->badRequest('User maksimal hanya 10 varian per produk');
             }
 
             $countProdDB = $this->produkRepo->totalProdukVarian($user->idMarket->user_id_market);
 
             if (($countProdDB + $countInputProduk) > 10) {
-                return new Respons(false, 'User maksimal hanya bisa membuat total 10 produk ');
+                return response()->badRequest('User maksimal hanya 10 varian per produk');
+                // return new Respons(false, 'User maksimal hanya bisa membuat total 10 produk ');
             }
             $allowed['user'] = $user;
 
@@ -105,7 +108,7 @@ class ProdukController extends Controller
             }
         }
 
-        return new Respons($res[0], $res[1]);
+        return $res;
     }
 
     public function migrateProdukToStore(Request $req)

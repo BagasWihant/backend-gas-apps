@@ -93,11 +93,13 @@ class ProdukRepo
 
             DB::connection('mysql_market')->commit();
 
-            return [true, 'Berhasil memposting produk fashion'];
+            return response()->created('Berhasil memposting produk',['s'=>'Yes','c'=>'fashion']);
+
         } catch (\Throwable $th) {
             DB::connection('mysql_market')->rollBack();
-            return [false, $th->getMessage()];
-            // return [false, 'Ada kesalahan memposting produk'];
+            return response()->internalServerError();
+            // return response()->internalServerError($th->getMessage());
+
             //throw $th;
         }
     }
@@ -209,14 +211,16 @@ class ProdukRepo
                 $insertMaster = [$mainData, $harga, $preview, $data['kategori']];
                 $this->InsertProdukMasterSearch($insertMaster);
             } else {
-                return [false, 'Kategori ini tidak ada'];
+                return response()->badRequest('Kategori ini Tidak ada');
             }
 
             DB::connection('mysql_market')->commit();
-            return [true, 'Berhasil posting produk kebutuhan pokok'];
+            return response()->created('Berhasil memposting produk',['s'=>'Yes','c'=>'pokok']);
+
         } catch (\Throwable $th) {
             DB::connection('mysql_market')->rollBack();
-            return [false, $th->getMessage()];
+            return response()->internalServerError('kesalahan sistem',$th);
+
         }
     }
 
@@ -245,7 +249,7 @@ class ProdukRepo
                 if (in_array($data['kategori'], $kt)) {
                     $kategori = 1;
                 } else {
-                    throw new \Exception("Kategori ini Tidak ada");
+                    return response()->badRequest('Kategori ini Tidak ada');
                 }
             } elseif ($data['jenis_produk'] == 2) {
                 $createData['expired'] = $data['expired'];
@@ -253,7 +257,7 @@ class ProdukRepo
                 if (in_array($data['kategori'], $kt)) {
                     $kategori = $data['kategori'];
                 } else {
-                    throw new \Exception("Kategori ini Tidak ada");
+                    return response()->badRequest('Kategori ini Tidak ada');
                 }
             }
 
@@ -310,11 +314,13 @@ class ProdukRepo
 
             DB::connection('mysql_market')->commit();
 
-            return [true, 'Berhasil memposting produk'];
+            // return [true, 'Berhasil memposting produk'];
+            return response()->created('Berhasil memposting produk',['s'=>'Not']);
         } catch (\Throwable $th) {
             //throw $th;
             DB::connection('mysql_market')->rollBack();
-            return [false, $th->getMessage()];
+            // return [false, $th->getMessage()];
+            return response()->internalServerError();
         }
     }
 
