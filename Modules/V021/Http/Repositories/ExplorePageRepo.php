@@ -31,7 +31,6 @@ class ExplorePageRepo
         $commonColumns = ['produk_id', 'name', 'img', 'rating', 'harga'];
         try {
 
-
             $query = DB::connection('mysql_market')
                 ->table('produk_masters')
                 ->select($commonColumns)
@@ -49,9 +48,10 @@ class ExplorePageRepo
             $res['data'] = $results->items();
             $res['maxPage'] = $results->lastPage();
             $res['currentPage'] = $results->currentPage();
-            return $res;
+            return response($res);
         } catch (\Throwable $th) {
-            return [false, 'Ada kesalahan server'];
+            $res = env('APP_DEBUG') ? response()->badRequest($th->getMessage()) : response()->badRequest();
+            return $res;
         }
     }
 
@@ -61,108 +61,35 @@ class ExplorePageRepo
         $tableID = ProdukMaster::where('produk_id', $id)->select(['is_user', 'table'])->first();
 
         if ($tableID) {
-            if ($tableID->is_user) $tableIDValue = $tableID->is_user;
-            else $tableIDValue = $tableID->table;
 
-            switch ($tableIDValue) {
-                case 99:
-                    $produk = ProdukUserMain::where('produk_id', $id)->select()->first();
-                    $image = $produk->images()->select('img')->get();
-                    $variasi = $produk->variasi()->select(['var_1', 'var_2', 'harga', 'stok','id AS kode'])->get();
-                    $data['image'] = $image;
-                    $data['variasi'] = $variasi;
-                    $data['produk'] = $produk;
-                    $data['is_user'] = '1';
-                    break;
+            $tableIDValue = ($tableID->is_user) ? $tableID->is_user : $tableID->table;
+            $tableMap = [
+                99 => ProdukUserMain::class,
+                1 => ProdukFashionMain::class,
+                6 => ProdukKebutuhanPokokMain::class,
+                7 => ProdukBuahSayurMain::class,
+                8 => ProdukMakanMinumMain::class,
+                9 => ProdukBumbuMain::class,
+                10 => ProdukMandiMain::class,
+                11 => ProdukKosmetikMain::class,
+            ];
 
-                case 1:
-                    $produk = ProdukFashionMain::where('produk_id', $id)->first();
-                    $image = $produk->images()->select('img')->get();
-                    $variasi = $produk->variasi()->select(['var_1', 'var_2', 'harga', 'stok','id AS kode'])->get();
-                    $data['image'] = $image;
-                    $data['variasi'] = $variasi;
-                    $data['produk'] = $produk;
-                    $data['is_user'] = '0';
+            if (isset($tableMap[$tableIDValue])) {
+                $modelClass = $tableMap[$tableIDValue];
+                $produk = $modelClass::where('produk_id', $id)->first();
+                $image = $produk->images()->select('img')->get();
+                $variasi = $produk->variasi()->select(['var_1', 'var_2', 'harga', 'stok', 'id AS kode'])->get();
+                $data['is_user'] = $tableID->is_user ? 1 : 0 ;
+                $data['image'] = $image;
+                $data['variasi'] = $variasi;
+                $data['produk'] = $produk;
 
-
-                    break;
-
-                case 6:
-                    $produk = ProdukKebutuhanPokokMain::where('produk_id', $id)->first();
-                    $image = $produk->images()->select('img')->get();
-                    $variasi = $produk->variasi()->select(['var_1', 'var_2', 'harga', 'stok','id AS kode'])->get();
-                    $data['image'] = $image;
-                    $data['variasi'] = $variasi;
-                    $data['produk'] = $produk;
-                    $data['is_user'] = '0';
-
-
-                    break;
-
-                case 7:
-                    $produk = ProdukBuahSayurMain::where('produk_id', $id)->first();
-                    $image = $produk->images()->select('img')->get();
-                    $variasi = $produk->variasi()->select(['var_1', 'var_2', 'harga', 'stok','id AS kode'])->get();
-                    $data['image'] = $image;
-                    $data['variasi'] = $variasi;
-                    $data['produk'] = $produk;
-                    $data['is_user'] = '0';
-
-
-                    break;
-
-                case 8:
-                    $produk = ProdukMakanMinumMain::where('produk_id', $id)->first();
-                    $image = $produk->images()->select('img')->get();
-                    $variasi = $produk->variasi()->select(['var_1', 'var_2', 'harga', 'stok','id AS kode'])->get();
-                    $data['image'] = $image;
-                    $data['variasi'] = $variasi;
-                    $data['produk'] = $produk;
-                    $data['is_user'] = '0';
-
-                    break;
-
-                case 9:
-                    $produk = ProdukBumbuMain::where('produk_id', $id)->first();
-                    $image = $produk->images()->select('img')->get();
-                    $variasi = $produk->variasi()->select(['var_1', 'var_2', 'harga', 'stok','id AS kode'])->get();
-                    $data['image'] = $image;
-                    $data['variasi'] = $variasi;
-                    $data['produk'] = $produk;
-                    $data['is_user'] = '0';
-
-                    break;
-
-                case 10:
-                    $produk = ProdukMandiMain::where('produk_id', $id)->first();
-                    $image = $produk->images()->select('img')->get();
-                    $variasi = $produk->variasi()->select(['var_1', 'var_2', 'harga', 'stok','id AS kode'])->get();
-                    $data['image'] = $image;
-                    $data['variasi'] = $variasi;
-                    $data['produk'] = $produk;
-                    $data['is_user'] = '0';
-
-                    break;
-
-                case 11:
-                    $produk = ProdukKosmetikMain::where('produk_id', $id)->first();
-                    $image = $produk->images()->select('img')->get();
-                    $variasi = $produk->variasi()->select(['var_1', 'var_2', 'harga', 'stok','id AS kode'])->get();
-                    $data['image'] = $image;
-                    $data['variasi'] = $variasi;
-                    $data['produk'] = $produk;
-                    $data['is_user'] = '0';
-
-                    break;
-
-                default:
-                    return [false, 'Kategori produk yang dipilih tidak ada'];
-                    break;
+                return response($data);
             }
-        } else {
-            return [false, 'Produk Tidak Ditemukan'];
-        }
 
-        return $data;
+            return response()->badRequest('Kategori Tidak Ada');
+        } else {
+            return response()->badRequest('Produk Tidak DItemukan');
+        }
     }
 }

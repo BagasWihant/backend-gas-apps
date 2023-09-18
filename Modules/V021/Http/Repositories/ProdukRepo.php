@@ -93,8 +93,7 @@ class ProdukRepo
 
             DB::connection('mysql_market')->commit();
 
-            return response()->created('Berhasil memposting produk',['s'=>'Yes','c'=>'fashion']);
-
+            return response()->created('Berhasil memposting produk', ['s' => 'Yes', 'c' => 'fashion']);
         } catch (\Throwable $th) {
             DB::connection('mysql_market')->rollBack();
             return response()->internalServerError();
@@ -215,12 +214,10 @@ class ProdukRepo
             }
 
             DB::connection('mysql_market')->commit();
-            return response()->created('Berhasil memposting produk',['s'=>'Yes','c'=>'pokok']);
-
+            return response()->created('Berhasil memposting produk', ['s' => 'Yes', 'c' => 'pokok']);
         } catch (\Throwable $th) {
             DB::connection('mysql_market')->rollBack();
-            return response()->internalServerError('kesalahan sistem',$th);
-
+            return response()->internalServerError('kesalahan sistem', $th);
         }
     }
 
@@ -246,19 +243,15 @@ class ProdukRepo
                 $createData['kondisi'] = $data['kondisi'];
                 // MAPPING KATEGORI
                 $kt = [1, 2, 3, 4, 5];
-                if (in_array($data['kategori'], $kt)) {
-                    $kategori = 1;
-                } else {
-                    return response()->badRequest('Kategori ini Tidak ada');
-                }
             } elseif ($data['jenis_produk'] == 2) {
                 $createData['expired'] = $data['expired'];
                 $kt = [6, 7, 8, 9, 10, 11];
-                if (in_array($data['kategori'], $kt)) {
-                    $kategori = $data['kategori'];
-                } else {
-                    return response()->badRequest('Kategori ini Tidak ada');
-                }
+            }
+
+            if (in_array($data['kategori'], $kt)) {
+                $kategori = $data['kategori'];
+            } else {
+                return response()->badRequest('Kategori ini Tidak ada');
             }
 
 
@@ -310,12 +303,12 @@ class ProdukRepo
 
 
             $insertMaster = [$createData, $harga, $preview, $kategori];
-            $this->InsertProdukMasterSearch($insertMaster,99);
+            $this->InsertProdukMasterSearch($insertMaster, 1);
 
             DB::connection('mysql_market')->commit();
 
             // return [true, 'Berhasil memposting produk'];
-            return response()->created('Berhasil memposting produk',['s'=>'Not']);
+            return response()->created('Berhasil memposting produk', ['s' => 'Not']);
         } catch (\Throwable $th) {
             //throw $th;
             DB::connection('mysql_market')->rollBack();
@@ -335,7 +328,7 @@ class ProdukRepo
         return $t;
     }
 
-    public function InsertProdukMasterSearch($data,$user = null)
+    public function InsertProdukMasterSearch($data, $user = null)
     {
         // FORMAT FILTER [ KATEGORI KONDISI ] SEMENTARA HANYA ITU
         $filter = "";
