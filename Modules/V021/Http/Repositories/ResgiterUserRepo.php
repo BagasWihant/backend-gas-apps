@@ -24,7 +24,6 @@ class ResgiterUserRepo
                 'user_id_main' => $userMain->id,
                 'user_id_market' => $userMarketId,
             ]);
-            // $otp->delete();
 
             DB::commit();
             DB::connection('mysql_market')->commit();
@@ -35,14 +34,12 @@ class ResgiterUserRepo
                 'token' => $userMain->createToken($userMain->name)->plainTextToken,
                 'name' => $userMain->name,
             ]);
-            $response =  response()->created('Berhasil Daftar', $res);
-            // return response()->json(['message'=>"Berhasil Mendaftar",$res]);
+            $response = env('APP_DEBUG') ? response()->created('Berhasil Daftar', $res) : response()->created('Berhasil Daftar');
         } catch (\Throwable $th) {
             DB::rollBack();
             DB::connection('mysql_market')->rollBack();
 
-            $response = response()->internalServerError($th->getMessage());
-            if (!env('APP_DEBUG')) $response = response()->internalServerError();
+            $response = env('APP_DEBUG') ? response()->internalServerError($th->getMessage()) : response()->internalServerError();
         }
         return $response;
     }
@@ -82,15 +79,14 @@ class ResgiterUserRepo
                 'token' => $userMain->createToken('token-name')->plainTextToken,
             ];
 
-            $response = response()->created('Berhasil Masuk Dengan Google', $res);
+            $response = env('APP_DEBUG') ? response()->created('Berhasil Masuk Dengan Google', $res) : response()->created('Berhasil Masuk Dengan Google');
             DB::commit();
             DB::connection('mysql_market')->commit();
         } catch (\Throwable $th) {
             DB::rollBack();
             DB::connection('mysql_market')->rollBack();
 
-            $response = response()->internalServerError($th->getMessage());
-            if (!env('APP_DEBUG')) $response = response()->internalServerError();
+            $response = env('APP_DEBUG') ? response()->internalServerError($th->getMessage()) : response()->internalServerError();
         }
         return $response;
     }
