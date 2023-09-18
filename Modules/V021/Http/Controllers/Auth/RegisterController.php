@@ -32,7 +32,7 @@ class RegisterController extends Controller
             'email' => 'required|email:filter,spoof,dns|unique:users,email',
         ]);
 
-        if ($validator->fails()) return new Respons(false, 'Validation Failed', $validator->errors());
+        if ($validator->fails()) return response()->badRequest('Validation Failed',$validator->errors());
 
 
         // GET OTP
@@ -48,7 +48,7 @@ class RegisterController extends Controller
             'title' => 'REGISTER CODE'
         ];
         // Mail::to($req->email)->send(new OTPRegister($mailData));
-        return new Respons(true, 'Kode berhasil dikirim', $mailData);
+        return response()->ok('Kode berhasil dikirim',$mailData);
     }
 
     public function registerConfirmOtp(Request $req)
@@ -57,27 +57,21 @@ class RegisterController extends Controller
             'key' => 'required|unique:users,email',
             'otp' => 'required',
         ]);
-        if ($validator->fails()) {
-            // return new Respons(false, 'Validation Failed', $validator->errors());
-            return response()->badRequest('Validation Failed',$validator->errors());
-        }
-
+        if ($validator->fails()) return response()->badRequest('Validation Failed',$validator->errors());
 
 
         $otp = Otpcode::where(['key' => $req->key, 'otp' => $req->otp, 'status' => 0, 'tipe' => 'REGISTER'])->first();
-        // if (!$otp) return new Respons(false, 'OTP Does Not Match');
 
-        // if (Carbon::now() > $otp->valid) return new Respons(false, 'OTP Timeout');
-        if (!$otp) return response()->ok('OTP Tidak Sama');
 
-        if (Carbon::now() > $otp->valid) return response()->ok('Waktu OTP Habis');
+        if (!$otp) return response()->badRequest('OTP Tidak Sama');
+
+        if (Carbon::now() > $otp->valid) return response()->badRequest('Waktu OTP Habis');
 
         $otp->status = 1;
         $otp->save();
         return response()->ok('OTP Terverifikasi');
-
-        // return new Respons(true, 'OTP Confirmed');
     }
+
 
     public function register(Request $req)
     {
@@ -93,10 +87,6 @@ class RegisterController extends Controller
         if ($validator->fails()) return response()->badRequest('Validarion Failed', $validator->errors());
 
 
-        // $otp = Otpcode::where(['key' => $req->email, 'status'=>1])->first();
-        // if(!$otp) return new Respons(false, 'Email belum diverifikasi');
-
-
         $input  = $only;
         $input['password'] = bcrypt($input['password']);
         $input['time'] = $this->strleft;
@@ -108,9 +98,9 @@ class RegisterController extends Controller
         $only = $req->only('name', 'email', 'photo');
         $validator = Validator::make($only, [
             'name' => 'required',
-            'email' => 'required|email:filter,spoof,dns|unique:users,email',
+            'email' => 'required|email:filter,spoof,dns',
         ]);
-        if ($validator->fails()) return new Respons(false, 'Validation Failed', $validator->errors());
+        if ($validator->fails()) return response()->badRequest('Validation Failed',$validator->errors());
         $only['time'] = $this->strleft;
 
         return $this->repo->registerWithGoogle($only);
