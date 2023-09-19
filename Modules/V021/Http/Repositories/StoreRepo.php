@@ -13,20 +13,22 @@ class StoreRepo
     {
 
         try {
-            DB::beginTransaction();
+            DB::connection('mysql_market')->beginTransaction();
             $type = $allowed['pict_profil']->getClientOriginalExtension();
             $name = $allowed['data']['store_id'] . ".$type";
             $allowed['pict_profil']->move($allowed['data']['pathPictStore'], $name);
 
-            $store = Store::create([
-                'user_id_market' => $allowed['data']['user']->idMarket->user_id_market,
-                'store_id' => $allowed['data']['store_id'],
-                'store_name' => $allowed['name'],
-                'store_lokasi' => isset($allowed['lokasi']) ? $allowed['lokasi'] : null,
-                'store_type' => $allowed['tipe'],
-                'store_kategori' => $allowed['kategori'],
-                'foto_profil' => $name,
-            ]);
+            $store = Store::create(
+                [
+                    'user_id_market' => $allowed['data']['user']->idMarket->user_id_market,
+                    'store_id' => $allowed['data']['store_id'],
+                    'store_name' => $allowed['name'],
+                    'store_lokasi' => isset($allowed['lokasi']) ? $allowed['lokasi'] : null,
+                    'store_type' => $allowed['tipe'],
+                    'store_kategori' => $allowed['kategori'],
+                    'foto_profil' => $name,
+                ]
+            );
 
             $typeKTP = $allowed['pict_ktp']->getClientOriginalExtension();
             $nameKTP = $allowed['data']['store_id'] . "_KTP.$typeKTP";
@@ -46,11 +48,12 @@ class StoreRepo
                 'ktp_img' => $nameKTP,
                 'self_img' => $nameSelf,
             ]);
-            DB::commit();
-            return [true,$store,$storeDetail];
+
+            DB::connection('mysql_market')->commit();
+            return env('APP_DEBUG') ? response()->created('Store ' . $allowed['name'] . ' Berhasil didaftarkan',$store->toArray()) : response()->created('Store ' . $allowed['name'] . ' Berhasil didaftarkan');
         } catch (\Throwable $th) {
-            DB::rollBack();
-            return [false, $th];
+            DB::connection('mysql_market')->rollBack();
+            return env('APP_DEBUG') ? response()->badRequest($th->getMessage()) : response()->badRequest();
         }
     }
 }

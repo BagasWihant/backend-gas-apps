@@ -52,7 +52,7 @@ class StoreController extends Controller
             'pict_ktp' => 'required|image|mimes:jpg,png,jpeg|max:2048',
             'pict_self' => 'required|image|mimes:jpg,png,jpeg|max:2048',
         ]);
-        if ($validator->fails()) return new Respons(false, 'Validation Failed', $validator->errors());
+        if ($validator->fails()) return response()->badRequest('Validasi Gagal',$validator->errors());
 
         $timestamp = Carbon::now()->timestamp;
         $rand = rand(1000, 9999);
@@ -71,11 +71,10 @@ class StoreController extends Controller
             "user" => $req->user()
         ]);
 
-        $proses = $this->storeRepo->create($allowed);
+        return $this->storeRepo->create($allowed);
+        // if(!$proses[0]) return new Respons(false,'Gagal mendaftarkan Toko');
 
-        if(!$proses[0]) return new Respons(false,'Gagal mendaftarkan Toko');
-
-        return new Respons(true,'Berhasil mendaftarkan Toko');
+        // return new Respons(true,'Berhasil mendaftarkan Toko');
 
     }
 
