@@ -53,7 +53,7 @@ class StoreRepo
             return env('APP_DEBUG') ? response()->created('Store ' . $allowed['name'] . ' Berhasil didaftarkan',$store->toArray()) : response()->created('Store ' . $allowed['name'] . ' Berhasil didaftarkan');
         } catch (\Throwable $th) {
             DB::connection('mysql_market')->rollBack();
-            return env('APP_DEBUG') ? response()->badRequest($th->getMessage()) : response()->badRequest();
+            return env('APP_DEBUG') ? response()->badRequest($th->getMessage()) : response()->badRequest('Gagal Mendaftarkan Store');
         }
     }
 }

@@ -217,7 +217,7 @@ class ProdukRepo
             return response()->created('Berhasil memposting produk', ['s' => 'Yes', 'c' => 'pokok']);
         } catch (\Throwable $th) {
             DB::connection('mysql_market')->rollBack();
-            return response()->internalServerError('kesalahan sistem', $th);
+            return env('APP_DEBUG') ? response()->badRequest($th->getMessage()) : response()->badRequest('Kesalahan Sistem');
         }
     }
 
@@ -261,7 +261,7 @@ class ProdukRepo
 
                 if ($data['user']->as_store == 0 && $produk['stok'] > 2) {
                     DB::connection('mysql_market')->rollBack();
-                    return [false, 'User maksimal 2 Stok per produk'];
+                    return response()->badRequest('User maksimal 2 Stok per produk');
                 }
 
                 if ($harga === null || $produk['harga'] < $harga) {
@@ -301,19 +301,16 @@ class ProdukRepo
 
             ProdukUserMain::create($createData);
 
-
             $insertMaster = [$createData, $harga, $preview, $kategori];
             $this->InsertProdukMasterSearch($insertMaster, 1);
 
             DB::connection('mysql_market')->commit();
 
-            // return [true, 'Berhasil memposting produk'];
             return response()->created('Berhasil memposting produk', ['s' => 'Not']);
         } catch (\Throwable $th) {
             //throw $th;
             DB::connection('mysql_market')->rollBack();
-            // return [false, $th->getMessage()];
-            return response()->internalServerError();
+            return env('APP_DEBUG') ? response()->badRequest($th->getMessage()) : response()->badRequest();
         }
     }
 
