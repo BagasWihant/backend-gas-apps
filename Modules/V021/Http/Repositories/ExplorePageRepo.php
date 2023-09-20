@@ -52,15 +52,15 @@ class ExplorePageRepo
     // Detail Produk
     public function detail($id)
     {
-        $tableID = ProdukMaster::where('produk_id', $id)->select(['is_user', 'table'])->first();
+        $tableID = ProdukMaster::where('produk_id', $id)->select('table')->first();
 
         if ($tableID) {
-            $produk = $this->ProdukDetail($tableID->table,$tableID->is_user,$id);
+            $produk = $this->ProdukDetail($tableID->table,$id);
             if($produk){
 
                 $image = $produk->images()->select('img')->get();
                 $variasi = $produk->variasi()->select(['var_1', 'var_2', 'harga', 'stok', 'id AS kode'])->get();
-                $data['is_user'] = $tableID->is_user ? 1 : 0;
+                $produk['table'] =$tableID->table;
                 $data['image'] = $image;
                 $data['variasi'] = $variasi;
                 $data['produk'] = $produk;

@@ -14,9 +14,9 @@ use App\Models\Produk\KebutuhanPokok\ProdukKebutuhanPokokMain;
 
 trait ProdukDetailTrait
 {
-    public function ProdukDetail($tableID, $is_user = null, $produkId)
+    public function ProdukDetail($tableID, $produkId)
     {
-        $tableIDValue = $is_user ? 0 : $tableID;
+        $tableIDValue = $tableID;
         $tableMap = [
             0 => ProdukUserMain::class,
             1 => ProdukFashionMain::class,

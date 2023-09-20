@@ -4,6 +4,7 @@ namespace Modules\V021\Http\Controllers\Marketplace;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Validator;
 use Modules\V021\Http\Repositories\KeranjangRepo;
 
 class KeranjangController extends Controller
@@ -27,9 +28,30 @@ class KeranjangController extends Controller
         dd($keranjang);
     }
 
-    public function store(Request $request)
+    public function store(Request $req)
     {
-        return $this->repo->store($request);
+        $allowed = $req->only(
+            'produk_id',
+            'seller_id',
+            'table',
+            'var_id',
+            'harga',
+            'qty',
+            'catatan',
+        );
+        $validator = Validator::make($allowed, [
+            'produk_id' => 'required',
+            'seller_id' => 'required',
+            'table' => 'required',
+            'var_id' => 'required',
+            'harga' => 'required',
+            'qty' => 'required',
+        ]);
+
+        if ($validator->fails()) return response()->badRequest('Validasi Gagal',$validator->errors());
+
+        $allowed['user'] = $req->user();
+        return $this->repo->store($allowed);
 
     }
 

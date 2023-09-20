@@ -241,17 +241,8 @@ class ProdukRepo
             if ($data['jenis_produk'] == 1) {
                 $createData['gender'] = $data['gender'];
                 $createData['kondisi'] = $data['kondisi'];
-                // MAPPING KATEGORI
-                $kt = [1, 2, 3, 4, 5];
             } elseif ($data['jenis_produk'] == 2) {
                 $createData['expired'] = $data['expired'];
-                $kt = [6, 7, 8, 9, 10, 11];
-            }
-
-            if (in_array($data['kategori'], $kt)) {
-                $kategori = $data['kategori'];
-            } else {
-                return response()->badRequest('Kategori ini Tidak ada');
             }
 
 
@@ -301,8 +292,8 @@ class ProdukRepo
 
             ProdukUserMain::create($createData);
 
-            $insertMaster = [$createData, $harga, $preview, $kategori];
-            $this->InsertProdukMasterSearch($insertMaster, 1);
+            $insertMaster = [$createData, $harga, $preview, 0];
+            $this->InsertProdukMasterSearch($insertMaster);
 
             DB::connection('mysql_market')->commit();
 
@@ -325,7 +316,7 @@ class ProdukRepo
         return $t;
     }
 
-    public function InsertProdukMasterSearch($data, $user = null)
+    public function InsertProdukMasterSearch($data)
     {
         // FORMAT FILTER [ KATEGORI KONDISI ] SEMENTARA HANYA ITU
         $filter = "";
@@ -341,7 +332,6 @@ class ProdukRepo
             'harga' => $data[1],
             'img' => $data[2],
             'table' => $data[3],
-            'is_user' => $user
         ];
         ProdukMaster::create($data);
     }
