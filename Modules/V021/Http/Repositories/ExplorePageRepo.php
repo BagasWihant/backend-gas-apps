@@ -62,9 +62,9 @@ class ExplorePageRepo
 
         if ($tableID) {
 
-            $tableIDValue = ($tableID->is_user) ? $tableID->is_user : $tableID->table;
+            $tableIDValue = ($tableID->is_user) ? 0 : $tableID->table;
             $tableMap = [
-                99 => ProdukUserMain::class,
+                0 => ProdukUserMain::class,
                 1 => ProdukFashionMain::class,
                 6 => ProdukKebutuhanPokokMain::class,
                 7 => ProdukBuahSayurMain::class,
