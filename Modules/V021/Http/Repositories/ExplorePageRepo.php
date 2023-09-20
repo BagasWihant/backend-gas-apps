@@ -2,20 +2,14 @@
 
 namespace Modules\V021\Http\Repositories;
 
-use App\Models\Produk\BuahSayur\ProdukBuahSayurMain;
-use App\Models\Produk\Bumbu\ProdukBumbuMain;
-use App\Models\Produk\Fashion\ProdukFashionMain;
-use App\Models\Produk\KebutuhanPokok\ProdukKebutuhanPokokMain;
-use App\Models\Produk\Kosmetik\ProdukKosmetikMain;
-use App\Models\Produk\MakanMinum\ProdukMakanMinumMain;
-use App\Models\Produk\Mandi\ProdukMandiMain;
-use App\Models\Produk\ProdukMaster;
-use App\Models\Produk\UserBasic\ProdukUserMain;
+use App\Traits\ProdukDetailTrait;
 use Illuminate\Support\Facades\DB;
-
+use App\Models\Produk\ProdukMaster;
 
 class ExplorePageRepo
 {
+    use ProdukDetailTrait;
+
     public function temukanProduk($data)
     {
         $binding = $data['binding'];
@@ -61,25 +55,12 @@ class ExplorePageRepo
         $tableID = ProdukMaster::where('produk_id', $id)->select(['is_user', 'table'])->first();
 
         if ($tableID) {
+            $produk = $this->ProdukDetail($tableID->table,$tableID->is_user,$id);
+            if($produk){
 
-            $tableIDValue = ($tableID->is_user) ? 0 : $tableID->table;
-            $tableMap = [
-                0 => ProdukUserMain::class,
-                1 => ProdukFashionMain::class,
-                6 => ProdukKebutuhanPokokMain::class,
-                7 => ProdukBuahSayurMain::class,
-                8 => ProdukMakanMinumMain::class,
-                9 => ProdukBumbuMain::class,
-                10 => ProdukMandiMain::class,
-                11 => ProdukKosmetikMain::class,
-            ];
-
-            if (isset($tableMap[$tableIDValue])) {
-                $modelClass = $tableMap[$tableIDValue];
-                $produk = $modelClass::where('produk_id', $id)->first();
                 $image = $produk->images()->select('img')->get();
                 $variasi = $produk->variasi()->select(['var_1', 'var_2', 'harga', 'stok', 'id AS kode'])->get();
-                $data['is_user'] = $tableID->is_user ? 1 : 0 ;
+                $data['is_user'] = $tableID->is_user ? 1 : 0;
                 $data['image'] = $image;
                 $data['variasi'] = $variasi;
                 $data['produk'] = $produk;
