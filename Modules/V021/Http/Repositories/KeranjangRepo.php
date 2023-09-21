@@ -12,9 +12,11 @@ use App\Models\Produk\MakanMinum\ProdukMakanMinumMain;
 use App\Models\Produk\KebutuhanPokok\ProdukKebutuhanPokokMain;
 use App\Models\Produk\UserBasic\ProdukUserMain;
 use App\Models\User;
+use App\Traits\ImagePathTraits;
 
 class KeranjangRepo
 {
+    use ImagePathTraits;
     public function store($data)
     {
         // SAMPAI BUAT KERANJANG
@@ -57,9 +59,14 @@ class KeranjangRepo
             foreach ($item as $item) {
 
                 $idSeller = $item->seller()->first();
-
-                if ($item->table_id == 0) $store = User::select(['name', 'photo'])->find($idSeller->user_id_main);
-                else $store = $idSeller->store()->select(['store_name as name', 'foto_profil as photo'])->first();
+                $photoPath = '';
+                if ($item->table_id == 0) {
+                    $store = User::select(['name', 'photo'])->find($idSeller->user_id_main);
+                    if ($store) $photoPath = $this->imagePathUser($store->photo);
+                } else {
+                    $store = $idSeller->store()->select(['store_name as name', 'foto_profil as photo'])->first();
+                    if ($store) $photoPath = $this->imagePathStore($store->photo);
+                }
 
                 $tableID = $item->table_id;
 
@@ -96,10 +103,15 @@ class KeranjangRepo
                         return response()->json(['message' => 'Kategori produk yang dipilih tidak ada']);
                 }
 
-                if (!isset($storeProducts[$store->name])) $storeProducts[$store->name] = ['name' => $store->name, 'photo' => $store->photo, 'data' => []];
+                if (!isset($storeProducts[$store->name])) $storeProducts[$store->name] = ['name' => $store->name, 'photo' => $photoPath, 'data' => []];
 
                 $produk = $modelName::where('produk_id', $item->produk_id)->select(['produk_id', 'name'])->first();
                 $img = $produk->images()->select('img')->first();
+
+                if ($img) {
+                    $img->img = $this->imagePathProduk($item->table_id, $img->img);
+                }
+
                 $variasi = $produk->variasi()->select(['var_1', 'var_2', 'stok', 'harga'])->find($item->var_id);
 
                 $itemData = [
@@ -119,7 +131,7 @@ class KeranjangRepo
             $res = count($data) > 0 ? response()->json($data) : response()->ok('Belum ada Produk');
             return $res;
         } catch (\Throwable $th) {
-            return env('APP_DEBUG') ? response()->internalServerError('',$th->getTrace()) : response()->internalServerError();
+            return env('APP_DEBUG') ? response()->internalServerError($th->getMessage(), $th->getTrace()) : response()->internalServerError();
         }
     }
 }

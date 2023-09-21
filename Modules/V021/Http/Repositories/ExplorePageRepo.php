@@ -2,6 +2,8 @@
 
 namespace Modules\V021\Http\Repositories;
 
+use App\Enums\TypeImageEnum;
+use App\Traits\ImagePathTraits;
 use App\Traits\ProdukDetailTrait;
 use Illuminate\Support\Facades\DB;
 use App\Models\Produk\ProdukMaster;
@@ -9,6 +11,7 @@ use App\Models\Produk\ProdukMaster;
 class ExplorePageRepo
 {
     use ProdukDetailTrait;
+    use ImagePathTraits;
 
     public function temukanProduk($data)
     {
@@ -22,7 +25,7 @@ class ExplorePageRepo
             $where .= " AND MATCH(key_filter) AGAINST(? IN BOOLEAN MODE)";
         }
 
-        $commonColumns = ['produk_id', 'name', 'img', 'rating', 'harga'];
+        $commonColumns = ['produk_id', 'name', 'img', 'rating', 'harga', 'table'];
         try {
 
             $query = DB::connection('mysql_market')
@@ -39,6 +42,9 @@ class ExplorePageRepo
             }
 
             $results = $query->paginate(25);
+            foreach ($results->items() as $key) {
+                $key->img = $this->imagePathProduk($key->table, $key->img);
+            }
             $res['data'] = $results->items();
             $res['maxPage'] = $results->lastPage();
             $res['currentPage'] = $results->currentPage();
@@ -55,12 +61,15 @@ class ExplorePageRepo
         $tableID = ProdukMaster::where('produk_id', $id)->select('table')->first();
 
         if ($tableID) {
-            $produk = $this->ProdukDetail($tableID->table,$id);
-            if($produk){
+            $produk = $this->ProdukDetail($tableID->table, $id);
+            if ($produk) {
 
                 $image = $produk->images()->select('img')->get();
+                foreach ($image as $image) {
+                    $image->img = $this->imagePathProduk($tableID->table,$image->img);
+                }
                 $variasi = $produk->variasi()->select(['var_1', 'var_2', 'harga', 'stok', 'id AS kode'])->get();
-                $produk['table'] =$tableID->table;
+                $produk['table'] = $tableID->table;
                 $data['image'] = $image;
                 $data['variasi'] = $variasi;
                 $data['produk'] = $produk;
