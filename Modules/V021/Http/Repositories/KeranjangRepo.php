@@ -116,6 +116,7 @@ class KeranjangRepo
 
                 $itemData = [
                     'name' => $produk->name,
+                    'idProduct' => $produk->produk_id,
                     'qty' => $item->qty,
                     'var_1' => $variasi ? $variasi->var_1 : null,
                     'var_2' => $variasi ? $variasi->var_2 : null,
@@ -133,5 +134,23 @@ class KeranjangRepo
         } catch (\Throwable $th) {
             return env('APP_DEBUG') ? response()->internalServerError($th->getMessage(), $th->getTrace()) : response()->internalServerError();
         }
+    }
+
+    public function updateQty($id,$int=null){
+        $keranjang = Keranjang::where('produk_id',$id)->select(['id','produk_id','qty'])->first();
+
+        if($int) $keranjang->qty = $int;
+        else $keranjang->qty ++;
+
+        $keranjang->save();
+    }
+
+    public function deleteItem($id){
+        $keranjang = Keranjang::where('produk_id',$id)->select(['id','produk_id'])->first();
+        if($keranjang) {
+            $keranjang->delete();
+            return response()->ok('Produk terhapus');
+        }
+        return response()->badRequest('Produk Tidak ada di keranjang');
     }
 }

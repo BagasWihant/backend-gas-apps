@@ -2,6 +2,7 @@
 
 namespace Modules\V021\Http\Controllers\Marketplace;
 
+use Illuminate\Auth\Events\Validated;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Validator;
@@ -21,11 +22,6 @@ class KeranjangController extends Controller
         $idMarket = $user->idMarket->user_id_market;
 
         return $this->repo->listProduk($idMarket);
-    }
-
-    public function show($keranjang)
-    {
-        dd($keranjang);
     }
 
     public function store(Request $req)
@@ -58,13 +54,21 @@ class KeranjangController extends Controller
 
     public function update(Request $request, $id)
     {
-        //
+        $validator = Validator::make($request->all(),[
+            'n'=>'integer',
+        ]);
+        if ($validator->fails()) return response()->badRequest('Validation Failed');
+
+
+        $int = null;
+        if($request->n >= 1 ) $int = $request->n;
+        $this->repo->updateQty($id,$int);
     }
 
 
 
     public function destroy($id)
     {
-        //
+        $this->repo->deleteItem($id);
     }
 }
