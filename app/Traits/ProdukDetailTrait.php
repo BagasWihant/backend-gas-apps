@@ -14,7 +14,7 @@ use App\Models\Produk\KebutuhanPokok\ProdukKebutuhanPokokMain;
 
 trait ProdukDetailTrait
 {
-    public function ProdukDetail($tableID, $produkId)
+    public function ProdukDetail($tableID, $produkId, array $column = [])
     {
         $tableIDValue = $tableID;
         $tableMap = [
@@ -30,8 +30,8 @@ trait ProdukDetailTrait
 
         if (isset($tableMap[$tableIDValue])) {
             $modelClass = $tableMap[$tableIDValue];
-            $produk = $modelClass::where('produk_id', $produkId)->first();
-
+            if ($column == null) $produk = $modelClass::where('produk_id', $produkId)->first();
+            else $produk = $modelClass::where('produk_id',$produkId)->select($column)->first();
             return $produk;
         }
     }

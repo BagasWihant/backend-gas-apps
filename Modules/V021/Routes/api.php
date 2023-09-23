@@ -11,6 +11,7 @@ use Modules\V021\Http\Controllers\Auth\RegisterController;
 use Modules\V021\Http\Controllers\Produk\ProdukController;
 use Modules\V021\Http\Controllers\Explore\ExploreController;
 use Modules\V021\Http\Controllers\Marketplace\KeranjangController;
+use Modules\V021\Http\Controllers\Marketplace\WishlistController;
 use Modules\V021\Http\Controllers\Utility\GantiAkunController;
 
 /*
@@ -46,7 +47,7 @@ Route::prefix('v021')->group(function () {
     });
 
 
-    // EXPLORE cari barang
+    // EXPLORE PAGE
     Route::prefix('explore')->group(function (){
         Route::controller(ExploreController::class)->group(function(){
             Route::get('/find/{key}', 'temukanProduk');
@@ -66,10 +67,11 @@ Route::prefix('v021')->group(function () {
             Route::post('/profile-foto', 'changeFoto');
         });
 
-        // ADDRESS || KERANJANG
+        // ADDRESS || KERANJANG || WISHLIST
         Route::resources([
             'profile-address' => AddressController::class,
             'keranjang' => KeranjangController::class,
+            'wishlist' =>WishlistController::class
         ]);
 
         // REGISTER STORE
