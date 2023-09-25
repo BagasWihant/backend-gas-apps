@@ -55,7 +55,7 @@ class LoginController extends Controller
         }
 
         // GET OTP
-        $validUntil = Carbon::now()->addMinute(5);
+        $validUntil = Carbon::now()->addSeconds(30);
         $codeOTP = rand(1000, 9999);
         Otpcode::updateOrCreate(
             ['key' => $req->email],
