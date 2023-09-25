@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('seller_id',12);
             $table->char('is_user',1)->comment('1=produk tabel user | 0=produk toko')->nullable();
             $table->string('produk_id',32);
-            $table->char('table_id',1)->comment('posisi produk tabel');
+            $table->char('table_id',2)->comment('posisi produk tabel');
             // $table->string('var_1',30)->nullable();
             // $table->string('var_2',30)->nullable();
             $table->bigInteger('var_id')->nullable();
