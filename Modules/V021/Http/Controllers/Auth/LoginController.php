@@ -86,7 +86,6 @@ class LoginController extends Controller
          // Validasi
         $validator = Validator::make($req->only('email','password','c_password'), [
             'password' => 'required',
-            'c_password' => 'required|same:password',
             'email' => 'required',
         ]);
         if ($validator->fails()) return response()->json(['message'=>'Validasi Gagal',$validator->errors()],400);
