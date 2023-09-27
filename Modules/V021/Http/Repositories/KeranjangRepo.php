@@ -52,7 +52,7 @@ class KeranjangRepo
     public function listProduk($id)
     {
 
-        $item = Keranjang::select(['seller_id', 'produk_id', 'table_id', 'var_id', 'harga', 'qty'])->where('user_id', $id)->orderBy('created_at', 'desc')->get();
+        $item = Keranjang::select(['seller_id', 'produk_id', 'table_id', 'var_id', 'harga', 'qty'])->where('user_id', $id)->orderBy('created_at', 'desc')->paginate(15);
         $storeProducts = [];
 
         try {
@@ -63,9 +63,11 @@ class KeranjangRepo
                 if ($item->table_id == 0) {
                     $store = User::select(['name', 'photo'])->find($idSeller->user_id_main);
                     if ($store) $photoPath = $this->imagePathUser($store->photo);
+                    $is_store = 0;
                 } else {
                     $store = $idSeller->store()->select(['store_name as name', 'foto_profil as photo'])->first();
                     if ($store) $photoPath = $this->imagePathStore($store->photo);
+                    $is_store = 1;
                 }
 
                 $tableID = $item->table_id;
@@ -103,7 +105,7 @@ class KeranjangRepo
                         return response()->json(['message' => 'Kategori produk yang dipilih tidak ada']);
                 }
 
-                if (!isset($storeProducts[$store->name])) $storeProducts[$store->name] = ['name' => $store->name, 'photo' => $photoPath, 'data' => []];
+                if (!isset($storeProducts[$store->name])) $storeProducts[$store->name] = ['name' => $store->name, 'photo' => $photoPath, 'seller' => $item->seller_id, 'store'=>$is_store , 'data' => []];
 
                 $produk = $modelName::where('produk_id', $item->produk_id)->select(['produk_id', 'name'])->first();
                 $img = $produk->images()->select('img')->first();
