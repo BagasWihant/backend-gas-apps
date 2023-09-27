@@ -12,6 +12,8 @@ use Modules\V021\Http\Controllers\Produk\ProdukController;
 use Modules\V021\Http\Controllers\Explore\ExploreController;
 use Modules\V021\Http\Controllers\Marketplace\KeranjangController;
 use Modules\V021\Http\Controllers\Marketplace\WishlistController;
+use Modules\V021\Http\Controllers\Orders\PaymentMethodController;
+use Modules\V021\Http\Controllers\Orders\OrderController;
 use Modules\V021\Http\Controllers\Utility\GantiAkunController;
 
 /*
@@ -71,7 +73,8 @@ Route::prefix('v021')->group(function () {
         Route::resources([
             'profile-address' => AddressController::class,
             'keranjang' => KeranjangController::class,
-            'wishlist' =>WishlistController::class
+            'wishlist' =>WishlistController::class,
+            'payment-method' =>PaymentMethodController::class,
         ]);
 
         // REGISTER STORE
