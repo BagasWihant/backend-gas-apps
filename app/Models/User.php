@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
 use App\Models\Marketplace\UserMarket;
+use App\Models\User\Address;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -50,5 +51,9 @@ class User extends Authenticatable
 
     public function idMarket(){
         return $this->hasOne(UserMarket::class,'user_id_main','id');
+    }
+
+    public function address(){
+        return $this->hasManyThrough(Address::class,UserMarket::class,'user_id_main','user_id_market','id','user_id_market');
     }
 }
