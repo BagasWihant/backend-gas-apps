@@ -119,6 +119,7 @@ class KeranjangRepo
                 $itemData = [
                     'name' => $produk->name,
                     'idProduct' => $produk->produk_id,
+                    'idVar' => $item->var_id,
                     'qty' => $item->qty,
                     'var_1' => $variasi ? $variasi->var_1 : null,
                     'var_2' => $variasi ? $variasi->var_2 : null,
