@@ -14,8 +14,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('orders', function (Blueprint $table) {
-            $table->string('id',50)->primary();
-            $table->string('seller_id',15);
+            $table->string('orderID',50)->primary();
             $table->string('buyer_id',15);
             $table->bigInteger('alamat_id');
             $table->integer('voucher_id')->nullable();
@@ -28,8 +27,8 @@ return new class extends Migration
             $table->char('status_transaksi',1);
             $table->char('status_pembayaran',1);
 
-            $table->integer('diskon')->nullable();
-            $table->integer('biaya_ongkir');
+            $table->integer('total_diskon')->nullable();
+            $table->integer('total_ongkir');
             $table->integer('biaya_service');
             $table->integer('total_amount');
             $table->timestamps();

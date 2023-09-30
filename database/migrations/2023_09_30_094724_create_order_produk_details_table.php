@@ -13,16 +13,16 @@ return new class extends Migration
 
     public function up(): void
     {
-        Schema::create('order_details', function (Blueprint $table) {
-            $table->string('order_id',50)->primary();
-
-            $table->string('produk_id',32);
+        Schema::create('order_produk_details', function (Blueprint $table) {
+            $table->id();
+            $table->string('orderID',32);
+            $table->string('sellerID',15);
+            $table->string('produkID',32);
             $table->char('table',2);
-            $table->integer('produk_weight')->comment('Gram');
-            $table->integer('produk_price');
+            $table->decimal('produkWeight');
+            $table->integer('produkPrice');
             $table->integer('qty');
-            $table->integer('total_price');
-
+            $table->integer('totalPrice');
         });
     }
 
@@ -31,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('order_details');
+        Schema::dropIfExists('order_produk_details');
     }
 };
